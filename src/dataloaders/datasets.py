@@ -161,7 +161,6 @@ def process_file(dataset: Dataset, mapper: Callable, output_file: str,
 
         encoded_sequence = dataset[idx]
 
-        # TODO : Perhaps we could pass a sequence2hilbert as a callable mapper
         mapped_sequence = mapper(encoded_sequence)
 
         if current_buffer_allocation >= current_buffer_size:
