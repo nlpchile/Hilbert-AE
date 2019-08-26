@@ -1,23 +1,67 @@
+from typing import List
+
 import numpy as np
 
 
-def hilbert_curve(n):
-    if n == 1:
+def hilbert_curve(order: int) -> np.ndarray:
+    '''
+
+    Method to compute the hilbert curve.
+
+    Args:
+
+        order (int) : Hilbert curve order.
+
+    Returns:
+
+        (numpy.ndarray) : It returns a numpy ndarray containing
+                          the hilbert curve mapping of "n" order.
+
+    '''
+
+    if order == 1:
         return np.zeros((1, 1), np.int32)
 
-    t = hilbert_curve(n // 2)
+    t = hilbert_curve(order // 2)
 
     a = np.flipud(np.rot90(t))
     b = t + t.size
     c = t + t.size * 2
     d = np.flipud(np.rot90(t, -1)) + t.size * 3
 
-    return np.vstack(map(np.hstack, [[a, b], [d, c]]))
+    hilbert_map = np.vstack(map(np.hstack, [[a, b], [d, c]]))
+
+    return hilbert_map
 
 
-def seq2hilbert(sequence, hilbert_map, channels=20):
+def sequence2hilbert(sequence: List[int],
+                     hilbert_map: np.ndarray,
+                     number_of_channels: int = 20) -> np.ndarray:
+    '''
 
-    map_ = np.zeros([hilbert_map.shape[0], hilbert_map.shape[1], channels])
+    Helper method to transform an input sequence to a hilbert space.
+
+    Args:
+
+        sequence (list) : An input list of numbers to be mapped by
+                          the hilbert_map.
+
+        hilbert_map (numpy.ndarray) : Predefined hilbert curve mapping.
+
+        number_of_channels (int) : Number of output channels.
+
+    Returns:
+
+        (numpy.ndarray) : It returns the sequence mapped by the
+                          given hilbert map.
+
+    '''
+
+    # TODO : It should recieve a sequence of embeddings instead of integers.
+
+    shape = [dim for dim in hilbert_map.shape] + [number_of_channels]
+
+    mapped_sequence = np.zeros(shape=shape, dtype=np.int)
 
     for idx, row in enumerate(hilbert_map):
 
@@ -27,35 +71,11 @@ def seq2hilbert(sequence, hilbert_map, channels=20):
 
                 continue
 
-            aa = sequence[ii]
+            element = sequence[ii]
 
-            if aa > channels:
+            if element > number_of_channels:
                 raise Exception("index > number of channels")
 
-            map_[idx, jdx, aa] = 1
+            mapped_sequence[idx, jdx, element] = 1
 
-    return map_
-
-
-if __name__ == '__main__':
-
-    # LITTLE TEST !
-    # HILBERT - MAP
-    #  0,  3,  4,  5
-    #  1,  2,  7,  6
-    # 14, 13,  8,  9
-    # 15, 12, 11, 10
-    #                   0 1 2 3 4 5 6 7 8 9 10 11
-
-    order = 4
-
-    hilbert_map = hilbert_curve(order)
-
-    map_ = seq2hilbert([0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0], hilbert_map, 2)
-
-    true_map = np.array([[[1, 0], [1, 0], [0, 1], [0, 1]],
-                         [[1, 0], [1, 0], [0, 1], [0, 1]],
-                         [[0, 0], [0, 0], [1, 0], [1, 0]],
-                         [[0, 0], [0, 0], [1, 0], [1, 0]]])
-
-    assert (map_ == true_map).all()
+    return mapped_sequence
