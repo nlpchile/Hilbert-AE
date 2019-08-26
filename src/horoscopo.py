@@ -5,6 +5,8 @@ from src.dataloaders.dataloaders import build_dataloader_from_disk
 from src.dataloaders.datasets import LanguageModelDataset, process_file
 from src.utils import HilbertMapper
 
+# Try running "%run src/horoscopo.py" magic in IPython
+
 #######################################################################################################################################
 # TODO : we should aim to be able to load all configurations, for example, from a config JSON file
 
@@ -66,5 +68,5 @@ for idx, minibatch in enumerate(dataset):
 
     print(hilbert_mapped_sequence.shape)
 
-    if idx > 10:
+    if idx > 1:
         break
