@@ -1,3 +1,5 @@
+from typing import Tuple
+
 import torch
 
 
@@ -9,8 +11,9 @@ class PadCollate:
         return pad_collate(batch, **self.kwargs)
 
 
-def pad_collate(batch: int, batch_first: bool = True,
-                padding_value: int = 0):  # TODO : Add type hint
+def pad_collate(batch: int, batch_first: bool = True, padding_value: int = 0
+                ) -> Tuple[torch.nn.utils.rnn.pad_sequence, torch.nn.utils.rnn.
+                           pad_sequence, torch.tensor]:
 
     batch.sort(key=lambda b: len(b[0]), reverse=True)
 
