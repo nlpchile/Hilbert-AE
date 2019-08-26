@@ -10,6 +10,12 @@ from src.utils import HilbertMapper, hilbert_curve, sequence2hilbert
 
 
 class LanguageModelDataset(Dataset):
+
+    # TODO: Perhaps we could add a stride parameter and see what happens
+    # with its latent space representation if we train a model to predict
+    # the next character given a context, for example, when using teacher
+    # forcing.
+
     def __init__(
             self,
             filename: str,
@@ -77,11 +83,6 @@ class LanguageModelDataset(Dataset):
 
         sequence_list = []
 
-        # TODO: Perhaps we could add a stride parameter,
-        # And see what happens with the latent space
-        # If we train a model to predict the next character
-        # Given a context, for example, when using teacher forcing.
-
         #embedding = np.array(self.tokens.token2index[self.start_token])
         #sequence_list.append(torch.from_numpy(embedding))
 
@@ -120,7 +121,9 @@ class HilbertDataset(torch.utils.data.Dataset):
         # TODO : We could rename it and make it a more general
         # dataloader that reads from binary files
 
+        # we could use a list of keys
         self.key_name = "hilbert"
+
         self.h5pyfile = h5py.File(filename, "r")
         self.num_seq = self.h5pyfile[self.key_name].shape[0]
 
