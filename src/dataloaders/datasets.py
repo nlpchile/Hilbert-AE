@@ -155,7 +155,7 @@ def process_file(dataset: Dataset, mapper: Callable, output_file: str,
     dataset_HDF5 = f.create_dataset(
         "hilbert", (current_buffer_size, order, order, vocabulary_size),
         maxshape=(None, order, order, vocabulary_size),
-        dtype='int32')
+        dtype="int32")
 
     for idx in range(0, len(dataset)):
 
