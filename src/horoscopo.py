@@ -6,7 +6,7 @@ import numpy as np
 
 from src.dataloaders.dataloaders import build_dataloader_from_disk
 from src.dataloaders.datasets import LanguageModelDataset, process_file
-from src.utils import HilbertMapper
+from src.HilbertMapper import HilbertMapper
 
 # Try running "%run src/horoscopo.py" magic in IPython
 
@@ -28,7 +28,7 @@ shuffle = True
 # Path to binary dataset file
 path_to_dataset_HDF5 = "dataset_HDF5.h5"
 
-################################################################################
+###############################################################################
 # Config JSONs
 kwargs: Dict[str, Union[str, Dict[str, str]]] = {}
 
@@ -83,10 +83,10 @@ process_file(dataset=language_model_dataset,
 # We load the dataset from disk
 dataset = build_dataloader_from_disk(**kwargs["build_dataloader_from_disk"])
 
-for index, minibatch in enumerate(dataset):
+for index, batch in enumerate(dataset):
 
     # shape : [batch_size, order, order, vocabulary_size]
-    hilbert_mapped_sequence = minibatch
+    hilbert_mapped_sequence = batch
 
     print(hilbert_mapped_sequence.shape)
 

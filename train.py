@@ -1,3 +1,4 @@
+"""Training Stage."""
 import argparse
 import os
 
@@ -5,11 +6,10 @@ import torch
 from torch import nn
 
 from src.AutoEncoder import autoencoder
-from src.DataLoader import Dataset_Hilbert, contruct_dataloader_from_disk
+from src.DataLoader import contruct_dataloader_from_disk
 
 
 def get_args():
-
     parser = argparse.ArgumentParser('Train Hilbert AutoEncoder')
     parser.add_argument('--hdf5_file', type=str, help='Path to HDF5 file')
     parser.add_argument('--checkpoint',
