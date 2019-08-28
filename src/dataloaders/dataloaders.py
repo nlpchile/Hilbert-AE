@@ -9,6 +9,7 @@ from src.dataloaders.datasets import HilbertDataset, LanguageModelDataset
 from src.dataloaders.PadCollate import PadCollate
 
 
+# TODO : Check if having batch_first = False as default still makes sense.
 class LanguageModelDataLoader():
     """Language Model Dataloader."""
 
