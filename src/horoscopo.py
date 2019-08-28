@@ -18,22 +18,25 @@ kwargs: Dict[str, Any] = {}
 
 # Language Model Dataset
 filename_raw = "./data/raw/horoscopo_raw.txt"
+max_number_of_examples = 100
 
-kwargs["language_model_dataset"] = {
-    "filename": filename_raw,
-    "separator": " ",
-    "max_number_of_examples": 100
-}
-
-# TODO : This is quite harcoded, we should infer the max sequence length from the dataset or truncate the sequences lenghs by this number
-max_sequence_length = 64
+max_sequence_length = 64  # TODO : This is quite harcoded, we should infer the max sequence length from the dataset or truncate the sequences lenghs by this number
 order = int(np.ceil(np.sqrt(max_sequence_length)))
 
 # DataLoader
 batch_size = 2
 shuffle = True
 
+# Path to binary dataset file
 path_to_dataset_HDF5 = "dataset_HDF5.h5"
+
+################################################################################
+# Language Model Dataset
+kwargs["language_model_dataset"] = {
+    "filename": filename_raw,
+    "separator": " ",
+    "max_number_of_examples": max_number_of_examples
+}
 
 # Process file args
 kwargs["process_file"] = {
@@ -56,7 +59,8 @@ kwargs["build_dataloader_from_disk"] = {
 language_model_dataset = LanguageModelDataset(
     **kwargs["language_model_dataset"])
 
-vocabulary_size = len(language_model_dataset.tokens)
+vocabulary_size = len(language_model_dataset.tokens
+                      )  # TODO : Perhaps we can have this values precomputed.
 
 # We initialize our Hilbert Mapper (callable)
 hilbert_mapper = HilbertMapper(order=order, number_of_channels=vocabulary_size)
