@@ -3,8 +3,51 @@
 import argparse
 import os
 
+import torch
+
+
+def load_from_checkpoint(model: torch.nn.Module, path_to_checkpoint: str):
+    """
+    Load from checkpoint.
+
+    Args:
+        model (torch.nn.Module) : A torch model.
+
+        path_to_checkpoint (str) : A path to checkpoint files.
+
+    Returns:
+        (torch.nn.Module) : A torch model.
+
+    """
+    # TODO : We must first save model and optimizer states.
+    # TODO : We must then load model and optimizer states from checkpoint.
+
+    if path_to_checkpoint is not None and os.path.exists(path_to_checkpoint):
+        model.load_state_dict(torch.load(path_to_checkpoint))
+
+    # Still work in progress.
+    raise NotImplementedError
+
+
+def process_batch(batch: torch.Tensor):
+    """
+    Process a torch Tensor batch.
+
+    Args:
+        batch (torch.Tensor) : A torch Tensor.
+
+    Returns:
+        (torch.Tensor) : A processed torch Tensor.
+
+    """
+    # TODO : We must update this method if we update the dataloader outputs.
+    x = torch.stack(batch).permute(dims=[0, 3, 1, 2]).float()
+
+    return x
+
 
 def create_folders(path: str = "./output/") -> None:
+    # TODO : Document and extend this method.
 
     if not os.path.exists(path):
         os.mkdir(path)
