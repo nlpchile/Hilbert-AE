@@ -1,46 +1,106 @@
+"""Autoencoder Modules."""
+from typing import Tuple
+
 import torch
 
 
 # General
 class Encoder(torch.nn.Module):
+    """A general Encoder Class."""
+
     def __init__(self, model: torch.nn.Module, **kwargs) -> None:
+        """
+        Encoder.
+
+        Args:
+            model [torch.nn.Module] : A torch model.
+
+        """
         super(Encoder, self).__init__()
 
         self.model = model(**kwargs)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Encode an input x to a latent representation z."""
         z = self.model(x)
         return z
 
 
 class Decoder(torch.nn.Module):
+    """A general Decoder Class."""
+
     def __init__(self, model: torch.nn.Module, **kwargs) -> None:
+        """
+        Decoder.
+
+        Args:
+            model [torch.nn.Module] : A torch model.
+
+        """
         super(Decoder, self).__init__()
 
         self.model = model(**kwargs)
 
-    def forward(self, z):
+    def forward(self, z: torch.Tensor) -> torch.Tensor:
+        """Decode an input representation z to an output representation y_hat."""
         y_hat = self.model(z)
         return y_hat
 
 
 class Autoencoder(torch.nn.Module):
+    """A general Autoencoder Class."""
+
     def __init__(self, encoder: torch.nn.Module, decoder: torch.nn.Module,
                  **kwargs) -> None:
+        """
+        Autoencoder.
+
+        Args:
+            encoder [torch.nn.Module] : A torch model.
+
+            decoder [torch.nn.Module] : A torch model.
+
+        """
         super(Autoencoder, self).__init__()
 
         self.encoder = encoder
         self.decoder = decoder
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor]:
+        """
+        Represent an input in an encoded space, then reconstructs it from it.
+
+        Args:
+            x [torch.Tensor] : An input torch tensor.
+
+        Returns:
+            Tuple[torch.Tensor] : A Tuple containing reconstructed input and
+                                  its internal latent representation.
+
+        """
+        # Latent representation
         z = self.encoder(x=x)
+
+        # Reconstructed input
         x_hat = self.decoder(z=z)
+
         return x_hat, z
 
 
 # Particular
 class convolutional_encoder(torch.nn.Module):
+    """Convolutional Encoder."""
+
     def __init__(self, nc: int, ndf: int, **kwargs) -> None:
+        """
+        Convolutional Encoder.
+
+        Args:
+            nc (int) : Input Channels
+
+            ndf (int) : Output Channels.
+
+        """
         super(convolutional_encoder, self).__init__()
 
         self.nc = nc
@@ -93,15 +153,26 @@ class convolutional_encoder(torch.nn.Module):
                             bias=self.bias),
         )
 
-    def forward(self, x):
-        out = self.model(x)
-        return out
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Encode an input x to a latent representation z."""
+        z = self.model(x)
+        return z
 
 
 class convolutional_decoder(torch.nn.Module):
+    """Convolutional Decoder."""
+
     def __init__(self, nc: int, ndf: int, **kwargs) -> None:
         super(convolutional_decoder, self).__init__()
+        """
+        Convolutional Decoder.
 
+        Args:
+            nc (int) : Input Channels
+
+            ndf (int) : Output Channels.
+
+        """
         self.nc = nc
         self.ndf = ndf
 
@@ -153,14 +224,26 @@ class convolutional_decoder(torch.nn.Module):
                                      bias=self.bias),
         )
 
-    def forward(self, x):
-        out = self.model(x)
-        return out
+    def forward(self, z: torch.Tensor):
+        """Decode an input representation z to an output representation y_hat."""
+        y_hat = self.model(z)
+        return y_hat
 
 
 # Still compatible with older implementation
 class autoencoder(torch.nn.Module):
-    def __init__(self, nc, ndf, **kwargs):
+    """A convolutional autoencoder."""
+
+    def __init__(self, nc: int, ndf: int, **kwargs):
+        """
+        Convolutional Autoencoder.
+
+        Args:
+            nc (int) : Input Channels
+
+            ndf (int) : Output Channels.
+
+        """
         super(autoencoder, self).__init__()
 
         self.nc = nc
@@ -175,6 +258,17 @@ class autoencoder(torch.nn.Module):
                                              **kwargs)
 
     def forward(self, x):
+        """
+        Represent an input in an encoded space, then reconstructs it from it.
+
+        Args:
+            x [torch.Tensor] : An input torch tensor.
+
+        Returns:
+            torch.Tensor : A torch tensor containing the reconstructed input.
+
+        """
         z = self.encoder(x)
         x_hat = self.decoder(z)
+
         return x_hat

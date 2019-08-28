@@ -1,34 +1,65 @@
+"""This module implements the DataLoaders Classes."""
+
 from typing import Tuple
 
 import torch
 from torch.utils.data import DataLoader, random_split
 
-from src.dataloaders.datasets import LanguageModelDataset, HilbertDataset
+from src.dataloaders.datasets import HilbertDataset, LanguageModelDataset
 from src.dataloaders.PadCollate import PadCollate
 
 
 class LanguageModelDataLoader():
-    def __init__(
-            self,
-            filename: str = "/text/data/raw/horoscopo_raw.txt",
-            separator: str = " ",
-            max_examples: int = -1,
-            #start_token: str = '<SOS>',
-            #end_token: str = '<EOS>',
-            batch_size: int = 32,
-            num_workers: int = torch.get_num_threads(),
-            shuffle: bool = True,
-            drop_last: bool = True,
-            batch_first: bool = False,
-            padding_value: int = -1,
-            dev_split: float = 0.1) -> None:
+    """Language Model Dataloader."""
 
+    def __init__(self,
+                 filename: str = "/text/data/raw/horoscopo_raw.txt",
+                 separator: str = " ",
+                 max_number_of_examples: int = -1,
+                 batch_size: int = 32,
+                 num_workers: int = torch.get_num_threads(),
+                 shuffle: bool = True,
+                 drop_last: bool = True,
+                 batch_first: bool = False,
+                 padding_value: int = -1,
+                 dev_split: float = 0.1) -> None:
+        """
+
+        Language Model Dataloader.
+
+        Args:
+            filename (str) : Path to the raw text.
+
+            separator (str) : A string identifier used to split the string
+                              into its respective tokens.
+
+            max_number_of_examples (int) : Max number of examples to load. To
+                                           load them all use
+                                           max_number_of_examples=-1 .
+
+            batch_size (int) : Number of items in a batch.
+
+            num_workers (int) : Number of workers to be used by the DataLoader.
+
+            shuffle (bool) : If True, it shuffles the dataset. Default = True.
+
+            drop_last (bool) : If True, it drops the last batch if its size is
+                               less than batch_size.
+
+            batch_first (bool) : Default : False.
+
+            padding_value (int) : Token index that represents the token used
+                                  for padding.
+
+            dev_split (float) : A positive float value in (0, 1) range that
+                                represents the percentaje of the data used for
+                                dev_set. Default = 0.1
+
+        """
         # Language Model Dataset
         self.filename = filename
         self.separator = separator
-        self.max_examples = max_examples
-        #self.start_token = start_token
-        #self.end_token = end_token
+        self.max_number_of_examples = max_number_of_examples
 
         # Language Model Data Loader
         self.batch_size = batch_size
@@ -44,20 +75,25 @@ class LanguageModelDataLoader():
         self.dev_split = dev_split
 
     def __dataset__(self) -> LanguageModelDataset:
-
+        """Return a LanguageModelDatasets."""
         # Dataset
         dataset = LanguageModelDataset(
             filename=self.filename,
             separator=self.separator,
-            max_examples=self.max_examples
-            #start_token=self.start_token,
-            #end_token=self.end_token
-        )
+            max_number_of_examples=self.max_number_of_examples)
 
         return dataset
 
     def data_loader(self) -> Tuple[DataLoader, DataLoader]:
+        """
 
+        Get the dataloaders.
+
+        Returns:
+            Tuple[Dataloader, Dataloader]: A tuple containing the train and
+                                           dev DataLoaders respectively.
+
+        """
         dataset = self.__dataset__()
 
         # Random Split
@@ -93,21 +129,47 @@ class LanguageModelDataLoader():
         return train_loader, dev_loader
 
     def __len__(self) -> int:
+        """Return the length of the dataset."""
         return len(self.__dataset__())
 
 
 def HilbertDataLoader(filename: str):
+    """
+
+    Return a HilbertDataset given a filename.
+
+    Args:
+        filename (str) : A string containing the filename to the dataset.
+
+    Returns:
+        (HilbertDataset) : A HilbertDataset object.
+
+    """
     return HilbertDataset(filename=filename)
 
 
 def build_dataloader_from_disk(filename: str,
-                               minibatch_size: int,
+                               batch_size: int,
                                shuffle: bool = True
                                ) -> torch.utils.data.DataLoader:
+    """
 
+    Build the dataloader from disk file.
+
+    Args:
+        filename (str):  A string containing the filename to the dataset.
+
+        batch_size (int) : Number of items in a batch.
+
+         shuffle (bool) : If True, it shuffles the dataset. Default = True.
+
+    Returns:
+        (torch.utils.data.Dataloader) : It returns a torch DataLoader.
+
+    """
     dataloader = torch.utils.data.DataLoader(
         HilbertDataLoader(filename=filename),
-        batch_size=minibatch_size,
+        batch_size=batch_size,
         shuffle=shuffle,
     )
 
