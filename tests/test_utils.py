@@ -1,13 +1,13 @@
 import numpy as np
 import pytest
 
-from src.utils import hilbert_curve, sequence2hilbert
+from src.utils import HilbertMapper
 
 
 def test_01_hilbert_curve():
 
     order = 2
-    hilbert_map = hilbert_curve(order=order)
+    hilbert_map = HilbertMapper.hilbert_curve(order=order)
 
     expected_hilbert_map = np.array([[0, 1], [3, 2]], dtype=np.int)
     expected_shape = (2, 2)
@@ -26,14 +26,15 @@ def test_02_sequence2hilbert():
     # hilbert_map of order 2
     hilbert_map = np.array([[0, 1], [3, 2]], dtype=np.int)
 
-    expected_shape = [dim for dim in hilbert_map.shape] + [number_of_channels]
+    expected_shape = (*hilbert_map.shape, number_of_channels)
 
-    mapped_sequence = sequence2hilbert(sequence=sequence,
-                                       hilbert_map=hilbert_map,
-                                       number_of_channels=number_of_channels)
+    mapped_sequence = HilbertMapper.sequence2hilbert(
+        sequence=sequence,
+        hilbert_map=hilbert_map,
+        number_of_channels=number_of_channels)
 
     assert isinstance(mapped_sequence, np.ndarray)
-    assert list(mapped_sequence.shape) == expected_shape
+    assert mapped_sequence.shape == expected_shape
 
 
 def test_03_hilbert_curve_and_sequence_2_hilbert():
@@ -47,14 +48,37 @@ def test_03_hilbert_curve_and_sequence_2_hilbert():
     #                   0 1 2 3 4 5 6 7 8 9 10 11
 
     order = 4
-    hilbert_map = hilbert_curve(order=order)
-
-    sequence = [0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0]
     number_of_channels = 2
 
-    mapped_sequence = sequence2hilbert(sequence=sequence,
-                                       hilbert_map=hilbert_map,
-                                       number_of_channels=number_of_channels)
+    sequence = [0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0]
+
+    expected_mapped_sequence = np.array(
+        [[[1, 0], [1, 0], [0, 1], [0, 1]], [[1, 0], [1, 0], [0, 1], [0, 1]],
+         [[0, 0], [0, 0], [1, 0], [1, 0]], [[0, 0], [0, 0], [1, 0], [1, 0]]],
+        dtype=np.int)
+
+    hilbert_map = HilbertMapper.hilbert_curve(order=order)
+
+    mapped_sequence = HilbertMapper.sequence2hilbert(
+        sequence=sequence,
+        hilbert_map=hilbert_map,
+        number_of_channels=number_of_channels)
+
+    assert (mapped_sequence == expected_mapped_sequence).all()
+
+
+def test_04_hilbert_mapper():
+
+    order = 4
+    number_of_channels = 2
+
+    sequence = [0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0]
+
+    # We initialize our mapper object
+    mapper = HilbertMapper(order=order, number_of_channels=number_of_channels)
+
+    # We invoke its "__call__" method
+    mapped_sequence = mapper(sequence=sequence)
 
     expected_mapped_sequence = np.array(
         [[[1, 0], [1, 0], [0, 1], [0, 1]], [[1, 0], [1, 0], [0, 1], [0, 1]],
