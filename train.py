@@ -1,78 +1,33 @@
 """Training Stage."""
-import argparse
 import os
 
 import torch
-from torch import nn
 
 from src.AutoEncoder import autoencoder
 from src.DataLoader import contruct_dataloader_from_disk
-
-
-def get_args():
-    parser = argparse.ArgumentParser('Train Hilbert AutoEncoder')
-    parser.add_argument('--hdf5_file', type=str, help='Path to HDF5 file')
-    parser.add_argument('--checkpoint',
-                        type=str,
-                        default=None,
-                        help='Path to Checkpoint Model')
-    parser.add_argument('--epochs',
-                        type=int,
-                        default=100,
-                        help='Number of epochs')
-    parser.add_argument('--early_stop',
-                        type=int,
-                        default=40,
-                        help='Early stop limit')
-    parser.add_argument('--lr',
-                        type=float,
-                        default=0.001,
-                        help='learning rate')
-    parser.add_argument('--weight_decay',
-                        type=float,
-                        default=1e-5,
-                        help='weight decay to optimizer')
-    parser.add_argument('--batch_size',
-                        type=int,
-                        default=256,
-                        help='Batch size')
-    parser.add_argument('--nc',
-                        type=int,
-                        default=1,
-                        help='Number of channels in data')
-    parser.add_argument('--ld',
-                        type=int,
-                        default=256,
-                        help='latent dimension size')
-
-    args, _ = parser.parse_known_args()
-    args = parser.parse_args()
-
-    return args
-
-
-def create_folders():
-
-    if not os.path.exists("./output/"):
-
-        os.mkdir("./output/")
+from src.utils import create_folders, get_args
 
 
 def train(args):
 
+    # if args.device is None: (?)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    # Input channels
     nc = args.nc
 
+    # Output channels
     ndf = args.ld
 
-    model = autoencoder(nc, ndf).to('cuda:1')
+    model = autoencoder(nc=nc, ndf=ndf).to(device)
 
+    # path_to_checkpoint
     checkpoint = args.checkpoint
 
     if checkpoint is not None and os.path.exists(checkpoint):
-
         model.load_state_dict(torch.load(checkpoint))
 
-    criterion = nn.MSELoss()
+    criterion = torch.nn.MSELoss()
 
     optimizer = torch.optim.Adam(model.parameters(),
                                  lr=args.lr,
@@ -97,9 +52,9 @@ def train(args):
 
         loss_train = 0
 
-        for idx, minibatch_ in enumerate(train_loader):
+        for idx, batch in enumerate(train_loader):
 
-            hilbert_map = minibatch_
+            hilbert_map = batch
 
             hilbert_map = torch.stack(hilbert_map).permute(0, 3, 1, 2).type(
                 torch.FloatTensor)
@@ -108,7 +63,7 @@ def train(args):
 
             # ===================forward=====================
 
-            output = model(hilbert_map)
+            output, latent = model(hilbert_map)
 
             loss = criterion(output, hilbert_map)
 
