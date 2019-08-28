@@ -1,7 +1,98 @@
 """Autoencoder Modules."""
-from typing import Tuple
+from typing import Any, Dict, Tuple
 
 import torch
+
+
+# Training
+def training_step(model: torch.nn.Module, x: torch.Tensor,
+                  optimizer: torch.optim,
+                  criterion: torch.nn) -> Dict[str, Any]:
+    """
+    Perform one optimization step over an input batch.
+
+    Args:
+        model (torch.nn.Module) : A torch model.
+
+        x (torch.Tensor) :  An input torch tensor.
+
+        optimizer (torch.optim) : A torch optimizer.
+
+        criterion (torch.nn) : A torch criterion / loss.
+
+    Returns:
+        (Dict[str, Any]) : A dict containing the results.
+
+                                keys : "loss", "x_hat" and "z"
+                                values: float, torch.Tensor, torch.Tensor
+
+    """
+    # x : [batch_size, *input_size]
+
+    # Training Fase
+    model.train()
+
+    # Zero Grad
+    optimizer.zero_grad()
+
+    # Forward
+
+    # [batch_size, *input_size], [batch_size, *latent_size]
+    x_hat, z = model.forward(x)
+
+    # Loss
+    loss = criterion(x_hat, x)
+
+    # Backward
+    loss.backward()
+
+    # Step
+    optimizer.step()
+
+    output = {"loss": loss.item(), "x_hat": x_hat, "z": z}
+
+    return output
+
+
+# Validation
+def validation_step(model: torch.nn.Module, x: torch.Tensor,
+                    criterion: torch.nn) -> Dict[str, Any]:
+    """
+    Perform an evaluation step over an input batch.
+
+    Args:
+        model (torch.nn.Module) : A torch model.
+
+        x (torch.Tensor) :  An input torch tensor.
+
+        criterion (torch.nn) : A torch criterion / loss.
+
+    Returns:
+        (Dict[str, Any]) : A dict containing the results.
+
+                                keys : "loss", "x_hat" and "z"
+                                values: float, torch.Tensor, torch.Tensor
+
+    """
+    # x : [batch_size, *input_size]
+
+    # evaluation fase
+    model.eval()
+
+    # To avoid gradients computation
+    with torch.no_grad():
+
+        # Forward
+
+        # [batch_size, *input_size], [batch_size, *latent_size]
+        x_hat, z = model.forward(x)
+
+        # Loss
+        loss = criterion(x_hat, x)
+
+        output = {"loss": loss.item(), "x_hat": x_hat, "z": z}
+
+        return output
 
 
 # General
@@ -269,6 +360,7 @@ class autoencoder(torch.nn.Module):
         Returns:
             (Tuple[torch.Tensor]) : A Tuple containing reconstructed input and
                                     its internal latent representation.
+
         """
         z = self.encoder(x)
         x_hat = self.decoder(z)
