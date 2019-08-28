@@ -1,6 +1,6 @@
 """Main applications of the currently implemented methods."""
 
-from typing import Any, Dict
+from typing import Any, Dict, Union
 
 import numpy as np
 
@@ -14,8 +14,6 @@ from src.utils import HilbertMapper
 # TODO : we should aim to be able to load all configurations, or example, from a config JSON file
 
 # Configs
-kwargs: Dict[str, Any] = {}
-
 # Language Model Dataset
 filename_raw = "./data/raw/horoscopo_raw.txt"
 max_number_of_examples = 100
@@ -31,6 +29,9 @@ shuffle = True
 path_to_dataset_HDF5 = "dataset_HDF5.h5"
 
 ################################################################################
+# Config JSONs
+kwargs: Dict[str, Union[str, Dict[str, str]]] = {}
+
 # Language Model Dataset
 kwargs["language_model_dataset"] = {
     "filename": filename_raw,
