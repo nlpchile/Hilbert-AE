@@ -6,7 +6,7 @@ import torch.utils.data
 class Dataset_Hilbert(torch.utils.data.Dataset):
     """Hilbert Dataset Class."""
 
-    def __init__(self, filename: str) -> None:
+    def __init__(self, filename: str, **kwargs) -> None:
         """
         Hilbert Dataset.
 
@@ -42,7 +42,7 @@ class Dataset_Hilbert(torch.utils.data.Dataset):
         return self.num_seq
 
 
-def DataLoader(filename: str) -> Dataset_Hilbert:
+def DataLoader(filename: str, **kwargs) -> Dataset_Hilbert:
     """
 
     Return a Dataset_Hilbert given a filename.
@@ -54,10 +54,11 @@ def DataLoader(filename: str) -> Dataset_Hilbert:
         (Dataset_Hilbert) : A Dataset_Hilbert object.
 
     """
-    return Dataset_Hilbert(filename=filename)
+    return Dataset_Hilbert(filename=filename, **kwargs)
 
 
-def contruct_dataloader_from_disk(filename: str, minibatch_size: int):
+def contruct_dataloader_from_disk(filename: str, minibatch_size: int,
+                                  **kwargs):
     """
 
     Build the dataloader from disk file.
@@ -69,8 +70,7 @@ def contruct_dataloader_from_disk(filename: str, minibatch_size: int):
         (torch.utils.data.Dataloader) : It returns a torch DataLoader.
 
     """
-    return torch.utils.data.DataLoader(
-        DataLoader(filename=filename),
-        batch_size=minibatch_size,
-        shuffle=True,
-    )
+    return torch.utils.data.DataLoader(DataLoader(filename=filename),
+                                       batch_size=minibatch_size,
+                                       shuffle=True,
+                                       **kwargs)

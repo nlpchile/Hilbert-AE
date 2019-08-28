@@ -23,7 +23,7 @@ class HilbertMapper:
         self.number_of_channels = number_of_channels
 
         # Here we initialize the computed hilbert map
-        self.hilbert_map = __class__.hilbert_curve(order=self.order)
+        self.hilbert_map = self.__class__.hilbert_curve(order=self.order)
 
         self._output_shape = (*self.hilbert_map.shape, self.number_of_channels)
 
@@ -40,7 +40,7 @@ class HilbertMapper:
 
         """
         # Here we compute the mapped sequence using the computed hilbert map
-        mapped_sequence = __class__.sequence2hilbert(
+        mapped_sequence = self.__class__.sequence2hilbert(
             sequence=sequence,
             hilbert_map=self.hilbert_map,
             number_of_channels=self.number_of_channels)
@@ -66,7 +66,7 @@ class HilbertMapper:
         if order == 1:
             return np.zeros(shape=(1, 1), dtype=np.int32)
 
-        t = __class__.hilbert_curve(order // 2)
+        t = HilbertMapper.hilbert_curve(order=order // 2)
 
         a = np.flipud(np.rot90(t))
         b = t + t.size

@@ -22,7 +22,8 @@ class LanguageModelDataLoader():
                  drop_last: bool = True,
                  batch_first: bool = False,
                  padding_value: int = -1,
-                 dev_split: float = 0.1) -> None:
+                 dev_split: float = 0.1,
+                 **kwargs) -> None:
         """
 
         Language Model Dataloader.
@@ -133,7 +134,7 @@ class LanguageModelDataLoader():
         return len(self.__dataset__())
 
 
-def HilbertDataLoader(filename: str):
+def HilbertDataLoader(filename: str, **kwargs):
     """
 
     Return a HilbertDataset given a filename.
@@ -150,8 +151,8 @@ def HilbertDataLoader(filename: str):
 
 def build_dataloader_from_disk(filename: str,
                                batch_size: int,
-                               shuffle: bool = True
-                               ) -> torch.utils.data.DataLoader:
+                               shuffle: bool = True,
+                               **kwargs) -> torch.utils.data.DataLoader:
     """
 
     Build the dataloader from disk file.

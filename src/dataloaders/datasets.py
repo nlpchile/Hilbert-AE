@@ -1,6 +1,6 @@
 """This module implements the Datasets classes and methods."""
 
-from typing import Callable, List, Tuple, Optional
+from typing import Callable, List, Tuple, Union
 
 import h5py
 import numpy as np
@@ -16,7 +16,8 @@ class LanguageModelDataset(Dataset):
     def __init__(self,
                  filename: str,
                  separator: str,
-                 max_number_of_examples: int = -1) -> None:
+                 max_number_of_examples: int = -1,
+                 **kwargs) -> None:
         """
         Language Model Dataset.
 
@@ -119,7 +120,7 @@ class LanguageModelDataset(Dataset):
 class HilbertDataset(torch.utils.data.Dataset):
     """Hilbert Dataset."""
 
-    def __init__(self, filename: str) -> None:
+    def __init__(self, filename: str, **kwargs) -> None:
         """
         Hilbert Dataset.
 
@@ -167,7 +168,8 @@ def process_file(dataset: Dataset,
                  order: int,
                  vocabulary_size: int,
                  name: str = "hilbert",
-                 dtype: Optional[str, type] = "int32") -> None:
+                 dtype: Union[str, type] = "int32",
+                 **kwargs) -> None:
     """
     Create a binary file from a given dataset.
 
@@ -178,7 +180,7 @@ def process_file(dataset: Dataset,
 
         name (str) : Name of the dataset.
 
-        dtype (Optional[int, type]) : Numpy dtype or string. It overrides the
+        dtype (Union[int, type]) : Numpy dtype or string. It overrides the
                                       data dtype.
 
         mapper (Callable): A callable that recieves an input item from the
