@@ -74,8 +74,8 @@ class Autoencoder(torch.nn.Module):
             x [torch.Tensor] : An input torch tensor.
 
         Returns:
-            Tuple[torch.Tensor] : A Tuple containing reconstructed input and
-                                  its internal latent representation.
+            (Tuple[torch.Tensor]) : A Tuple containing reconstructed input and
+                                    its internal latent representation.
 
         """
         # Latent representation
@@ -259,7 +259,7 @@ class autoencoder(torch.nn.Module):
                                              ndf=self.ndf,
                                              **kwargs)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor]:
         """
         Represent an input in an encoded space, then reconstructs it from it.
 
@@ -267,10 +267,10 @@ class autoencoder(torch.nn.Module):
             x [torch.Tensor] : An input torch tensor.
 
         Returns:
-            torch.Tensor : A torch tensor containing the reconstructed input.
-
+            (Tuple[torch.Tensor]) : A Tuple containing reconstructed input and
+                                    its internal latent representation.
         """
         z = self.encoder(x)
         x_hat = self.decoder(z)
 
-        return x_hat
+        return x_hat, z
