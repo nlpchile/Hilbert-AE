@@ -42,7 +42,7 @@ class Decoder(torch.nn.Module):
         self.model = model(**kwargs)
 
     def forward(self, z: torch.Tensor) -> torch.Tensor:
-        """Decode an input representation z to an output representation y_hat."""
+        """Decode an input representation z into a representation y_hat."""
         y_hat = self.model(z)
         return y_hat
 
@@ -163,8 +163,8 @@ class convolutional_decoder(torch.nn.Module):
     """Convolutional Decoder."""
 
     def __init__(self, nc: int, ndf: int, **kwargs) -> None:
-        super(convolutional_decoder, self).__init__()
         """
+
         Convolutional Decoder.
 
         Args:
@@ -173,6 +173,8 @@ class convolutional_decoder(torch.nn.Module):
             ndf (int) : Output Channels.
 
         """
+        super(convolutional_decoder, self).__init__()
+
         self.nc = nc
         self.ndf = ndf
 
@@ -225,7 +227,7 @@ class convolutional_decoder(torch.nn.Module):
         )
 
     def forward(self, z: torch.Tensor):
-        """Decode an input representation z to an output representation y_hat."""
+        """Decode an input representation z into a representation y_hat."""
         y_hat = self.model(z)
         return y_hat
 
