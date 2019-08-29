@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from src.utils import HilbertMapper
+from src.HilbertMapper import HilbertMapper
 
 
 def test_01_hilbert_curve():
