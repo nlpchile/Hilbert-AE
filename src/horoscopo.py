@@ -10,6 +10,8 @@ from src.HilbertMapper import HilbertMapper
 
 # Try running "%run src/horoscopo.py" magic in IPython
 
+# TODO : Make an independent script to load the raw txt and save it as binary dataset .
+
 ###############################################################################
 # TODO : we should aim to be able to load all configurations, or example, from a config JSON file
 
@@ -90,5 +92,5 @@ for index, batch in enumerate(dataset):
 
     print(hilbert_mapped_sequence.shape)
 
-    if index > 1:
+    if index == 1:
         break
