@@ -7,7 +7,7 @@ import torch
 
 
 def get_args():
-
+    """Get Arguments from terminal."""
     parser = argparse.ArgumentParser('Train Hilbert AutoEncoder')
 
     parser.add_argument('--device',
@@ -64,6 +64,25 @@ def get_args():
     return args
 
 
+def save_checkpoint(model: torch.nn.Module,
+                    optimizer: torch.optim,
+                    path: str = "./checkpoints/") -> str:
+    """
+    Save Model and Optimizer checkpoint.
+
+    Args:
+        model (torch.nn.Module) : A pytorch model.
+        optimizer (torch.optim) : A pytor optimizer.
+        path (str) : A path to save the checkpoints.
+
+    Returns:
+        () :
+
+    """
+    # TODO : Perhaps we need some identifiers or we could automatically create a folder by experiment.
+    raise NotImplementedError
+
+
 def load_from_checkpoint(model: torch.nn.Module, path_to_checkpoint: str):
     """
     Load from checkpoint.
@@ -105,9 +124,28 @@ def process_batch(batch: torch.Tensor):
 
 
 def create_folders(path: str = "./output/") -> None:
+    """
+    Create folder.
+
+    Args :
+        path (str): Path to the folder that's being created.
+
+    """
     # TODO : Document and extend this method.
+    # Try using pathlib.Path and its mkdir method.
 
     if not os.path.exists(path):
         os.mkdir(path)
 
     return
+
+
+def save_as_binary_dataset(*args, **kwargs):
+    """Save a dataset object as binary file."""
+    raise NotImplementedError
+
+
+def load_dataset(path: str, *args, **kwargs):
+    """Load a dataset object from path."""
+    # Maybe we can infer if binary or raw by looking at the file extension.
+    raise NotImplementedError
