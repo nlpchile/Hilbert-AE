@@ -169,6 +169,7 @@ def build_dataloader_from_disk(filename: str,
         (torch.utils.data.Dataloader) : It returns a torch DataLoader.
 
     """
+    # TODO : Get dataset from args
     dataloader = torch.utils.data.DataLoader(
         HilbertDataLoader(filename=filename),
         batch_size=batch_size,

@@ -163,10 +163,10 @@ class HilbertDataset(torch.utils.data.Dataset):
 
 
 def process_file(dataset: Dataset,
-                 mapper: Callable,
                  output_file: str,
                  order: int,
                  vocabulary_size: int,
+                 mapper: Callable = None,
                  name: str = "hilbert",
                  dtype: Union[str, type] = "int32",
                  **kwargs) -> None:
@@ -211,16 +211,18 @@ def process_file(dataset: Dataset,
 
     for index in range(0, len(dataset)):
 
-        encoded_data = dataset[index]
+        data = dataset[index]
 
-        mapped_data = mapper(encoded_data)
+        if mapper is not None:
+            data = mapper(data)
 
         if current_buffer_allocation >= current_buffer_size:
             current_buffer_size = current_buffer_size + 1
             dataset_HDF5.resize((current_buffer_size, *shape))
 
-        dataset_HDF5[current_buffer_allocation] = mapped_data
+        dataset_HDF5[current_buffer_allocation] = data
 
         current_buffer_allocation += 1
 
+    # TODO : Return absolute output_path
     return
