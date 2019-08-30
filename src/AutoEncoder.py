@@ -174,7 +174,7 @@ class Autoencoder(torch.nn.Module):
 
         Returns:
             (Tuple[Tensor]) : A Tuple containing reconstructed input and
-                                    its internal latent representation.
+                              its internal latent representation.
 
         """
         # Latent representation
