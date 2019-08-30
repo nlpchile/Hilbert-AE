@@ -3,7 +3,7 @@ from typing import Any, Dict, Tuple
 
 import torch
 
-# TODO : Ffix Type Annotations for PyTorch criterion and optimizer.
+# TODO : Fix Type Annotations for PyTorch criterion and optimizer.
 
 Tensor = torch.Tensor
 
