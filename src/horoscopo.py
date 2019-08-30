@@ -32,7 +32,7 @@ path_to_dataset_HDF5 = "dataset_HDF5.h5"
 
 ###############################################################################
 # Config JSONs
-kwargs: Dict[str, Union[str, Dict[str, str]]] = {}
+kwargs: Dict[str, Union[str, Dict[str, Union[str, int]], int]] = {}
 
 # Language Model Dataset
 kwargs["language_model_dataset"] = {

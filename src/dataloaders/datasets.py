@@ -9,6 +9,8 @@ from torch.utils.data import Dataset
 
 from src.dataloaders.Tokens import Tokens
 
+Tensor = torch.Tensor
+
 
 class LanguageModelDataset(Dataset):
     """Language Model Dataset."""
@@ -50,8 +52,9 @@ class LanguageModelDataset(Dataset):
 
     def __load__(self) -> Tuple[List[List[str]], List[List[int]], List[int]]:
         """Return the tokenized strings, its respectives tokens and lengths."""
-        lines = []
-        out, lengths = [], []
+        lines: List[List[str]] = []
+        out: List[List[int]] = []
+        lengths: List[int] = []
 
         with open(self.filename, "r") as file:
 
@@ -91,14 +94,14 @@ class LanguageModelDataset(Dataset):
                           retrieve.
 
         Returns:
-            (torch.Tensor) :  It returns an item as a torch.Tensor.
+            (Tensor) :  It returns an item as a Tensor.
 
         """
-        x = self.lines[index]
+        line = self.lines[index]
 
         sequence_list = []
 
-        for token in x:
+        for token in line:
 
             if token not in self.tokens.token2index:
                 raise ValueError("Not in vocabulary: '" + token + "'")
@@ -108,7 +111,7 @@ class LanguageModelDataset(Dataset):
 
             sequence_list.append(torch.from_numpy(embedding))
 
-        x = torch.stack(sequence_list)
+        x: Tensor = torch.stack(sequence_list)
 
         return x
 

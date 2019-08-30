@@ -4,6 +4,11 @@ import argparse
 import os
 
 import torch
+from typing import Union, Tuple, List
+
+import typing
+
+Tensor = torch.Tensor
 
 
 def get_args():
@@ -106,15 +111,15 @@ def load_from_checkpoint(model: torch.nn.Module, path_to_checkpoint: str):
     raise NotImplementedError
 
 
-def process_batch(batch: torch.Tensor):
+def process_batch(batch: Union[Tuple[Tensor, ...], List[Tensor]]):
     """
     Process a torch Tensor batch.
 
     Args:
-        batch (torch.Tensor) : A torch Tensor.
+        batch (Tensor) : A torch Tensor.
 
     Returns:
-        (torch.Tensor) : A processed torch Tensor.
+        (Tensor) : A processed torch Tensor.
 
     """
     # TODO : We must update this method if we update the dataloader outputs.

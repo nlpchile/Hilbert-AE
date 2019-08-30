@@ -1,8 +1,10 @@
 """PadCollate class useful as collate_fn for torch DataLoaders."""
 
-from typing import Tuple
+from typing import Any, List, Tuple
 
 import torch
+
+Tensor = torch.Tensor
 
 
 class PadCollate:
@@ -12,29 +14,29 @@ class PadCollate:
         """PadCollate."""
         self.kwargs = kwargs
 
-    def __call__(self, batch: Tuple[int]) -> Tuple[torch.Tensor]:
+    def __call__(self, batch: List[int]) -> Tuple[Tensor, ...]:
         """
 
         Call method that applies the path_collate method.
 
         Args:
-            batch (Tuple[int]) : As input it recieves a batch Tuple.
+            batch (List[int]) : As input it recieves a batch Tuple.
 
         Returns:
-            (Tuple[torch.Tensor]) : It returns a Tuple .
+            (Tuple[Tensor]) : It returns a Tuple .
 
         """
-        return __class__.pad_collate(batch, **self.kwargs)
+        return self.__class__.pad_collate(batch, **self.kwargs)
 
     @staticmethod
-    def pad_collate(batch: Tuple[int],
+    def pad_collate(batch: Any,
                     batch_first: bool = True,
-                    padding_value: int = 0) -> Tuple[torch.Tensor]:
+                    padding_value: int = 0) -> Tuple[Tensor, ...]:
         """
         Apply padding to the input batch Tuple.
 
         Args:
-            batch (Tuple) : A batch Tuple containing (X, Y) input sequences.
+            batch (Any) : A batch Tensor containing (X, Y) input sequences.
 
             batch_first (bool) : If True, the batch dimension is first,
                                  so [B, T, *].
@@ -48,7 +50,7 @@ class PadCollate:
                                   symbol.
 
         Returns:
-            (Tuple[torch.Tensor]) : It returns a Tuple containing
+            (Tuple[Tensor]) : It returns a Tuple containing
                                     (X, Y, lengths) tensors.
 
         """
@@ -64,12 +66,14 @@ class PadCollate:
         # https://discuss.pytorch.org/t/difference-between-torch-tensor-and-torch-tensor/30786/2
         lengths = torch.tensor([len(X) for X in X_seq])
 
-        X = torch.nn.utils.rnn.pad_sequence(sequences=X_seq,
-                                            batch_first=batch_first,
-                                            padding_value=padding_value)
+        X: Tensor = torch.nn.utils.rnn.pad_sequence(
+            sequences=X_seq,
+            batch_first=batch_first,
+            padding_value=padding_value)
 
-        Y = torch.nn.utils.rnn.pad_sequence(sequences=Y_seq,
-                                            batch_first=batch_first,
-                                            padding_value=padding_value)
+        Y: Tensor = torch.nn.utils.rnn.pad_sequence(
+            sequences=Y_seq,
+            batch_first=batch_first,
+            padding_value=padding_value)
 
         return (X, Y, lengths)
