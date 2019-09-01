@@ -1,6 +1,6 @@
 """Main applications of the currently implemented methods."""
 
-from typing import Any, Dict, Union
+from typing import Any, Dict, List, Union
 
 import numpy as np
 
@@ -32,7 +32,7 @@ path_to_dataset_HDF5 = "dataset_HDF5.h5"
 
 ###############################################################################
 # Config JSONs
-kwargs: Dict[str, Union[str, Dict[str, Union[str, int]], int]] = {}
+kwargs: Dict[str, Union[str, Dict[str, Union[List, str, int]], int]] = {}
 
 # Language Model Dataset
 kwargs["language_model_dataset"] = {
