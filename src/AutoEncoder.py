@@ -3,14 +3,13 @@ from typing import Any, Dict, Tuple
 
 import torch
 
-# TODO : Fix Type Annotations for PyTorch criterion and optimizer.
-
 Tensor = torch.Tensor
 
 
 # Training
-def training_step(model: torch.nn.Module, x: Tensor, optimizer: torch.optim,
-                  criterion: torch.nn) -> Dict[str, Any]:
+def training_step(model: torch.nn.Module, x: Tensor,
+                  optimizer: torch.optim.Optimizer,
+                  criterion: torch.nn.Module) -> Dict[str, Any]:
     """
     Perform one optimization step over an input batch.
 
@@ -59,7 +58,7 @@ def training_step(model: torch.nn.Module, x: Tensor, optimizer: torch.optim,
 
 # Validation
 def validation_step(model: torch.nn.Module, x: Tensor,
-                    criterion: torch.nn) -> Dict[str, Any]:
+                    criterion: torch.nn.Module) -> Dict[str, Any]:
     """
     Perform an evaluation step over an input batch.
 
