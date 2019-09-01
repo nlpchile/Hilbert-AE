@@ -13,54 +13,54 @@ Tensor = torch.Tensor
 
 def get_args():
     """Get Arguments from terminal."""
-    parser = argparse.ArgumentParser('Train Hilbert AutoEncoder')
+    parser = argparse.ArgumentParser("Train Hilbert AutoEncoder")
 
-    parser.add_argument('--device',
+    parser.add_argument("--device",
                         type=str,
                         default=None,
                         help="torch device as a string")
 
-    parser.add_argument('--hdf5_file', type=str, help='Path to HDF5 file')
+    parser.add_argument("--hdf5_file", type=str, help="Path to HDF5 file")
 
-    parser.add_argument('--checkpoint',
+    parser.add_argument("--checkpoint",
                         type=str,
                         default=None,
-                        help='Path to Checkpoint Model')
+                        help="Path to Checkpoint Model")
 
-    parser.add_argument('--epochs',
+    parser.add_argument("--epochs",
                         type=int,
                         default=100,
-                        help='Number of epochs')
+                        help="Number of epochs")
 
-    parser.add_argument('--early_stop',
+    parser.add_argument("--early_stop",
                         type=int,
                         default=40,
-                        help='Early stop limit')
+                        help="Early stop limit")
 
-    parser.add_argument('--lr',
+    parser.add_argument("--lr",
                         type=float,
                         default=0.001,
-                        help='learning rate')
+                        help="learning rate")
 
-    parser.add_argument('--weight_decay',
+    parser.add_argument("--weight_decay",
                         type=float,
                         default=1e-5,
-                        help='weight decay to optimizer')
+                        help="weight decay to optimizer")
 
-    parser.add_argument('--batch_size',
+    parser.add_argument("--batch_size",
                         type=int,
                         default=256,
-                        help='Batch size')
+                        help="Batch size")
 
-    parser.add_argument('--nc',
+    parser.add_argument("--nc",
                         type=int,
                         default=1,
-                        help='Number of channels in data')
+                        help="Number of channels in data")
 
-    parser.add_argument('--ld',
+    parser.add_argument("--ld",
                         type=int,
                         default=256,
-                        help='latent dimension size')
+                        help="latent dimension size")
 
     args, _ = parser.parse_known_args()
 
@@ -70,7 +70,7 @@ def get_args():
 
 
 def save_checkpoint(model: torch.nn.Module,
-                    optimizer: torch.optim,
+                    optimizer: torch.optim.Optimizer,
                     path: str = "./checkpoints/") -> str:
     """
     Save Model and Optimizer checkpoint.
