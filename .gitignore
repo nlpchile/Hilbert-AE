@@ -1,4 +1,13 @@
+# Visual Studio Code
 .vscode
+
+# mypy
+.mypy_cache/
+.vscode/settings.json
+.DS_Store
+
+# binary files
+*.h5
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -101,11 +110,3 @@ venv.bak/
 
 # mkdocs documentation
 /site
-
-# mypy
-.mypy_cache/
-.vscode/settings.json
-.DS_Store
-
-# binary files
-*.h5

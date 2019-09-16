@@ -53,7 +53,8 @@ def train(args):
 
     criterion = torch.nn.MSELoss(**kwargs["loss"])
 
-    optimizer = torch.optim.Adam(model.parameters(), **kwargs["optimizer"])
+    optimizer = torch.optim.Adam(params=model.parameters(),
+                                 **kwargs["optimizer"])
 
     train_loader = build_dataloader_from_disk(
         **kwargs["build_dataloader_from_disk"])
