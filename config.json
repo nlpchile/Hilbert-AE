@@ -1,0 +1,32 @@
+{
+    "build_dataloader_from_disk": {
+        "filename": "./dataset_HDF5.h5",
+        "batch_size": 2,
+        "shuffle": true
+    },
+    "autoencoder": {
+        "nc": 13964,
+        "ndf": 256
+    },
+    "optimizer": {
+        "lr": 1e-4,
+        "betas": [
+            0.9,
+            0.999
+        ],
+        "eps": 1e-8,
+        "weight_decay": 1e-5,
+        "amsgrad": false
+    },
+    "loss": {
+        "size_average": null,
+        "reduce": null,
+        "reduction": "mean"
+    },
+    "seed": 42,
+    "device": null,
+    "enforce_reproducibility": false,
+    "epochs": 10,
+    "early_stop": 5,
+    "path_to_checkpoints": "./checkpoints/"
+}
