@@ -5,7 +5,8 @@ import json
 import os
 import random
 import typing
-from typing import List, Tuple, Union
+from pathlib import Path
+from typing import Dict, List, Tuple, Union
 
 import numpy as np
 import torch
@@ -80,44 +81,100 @@ def set_config(seed: int, device: torch.device,
 
 def save_checkpoint(model: torch.nn.Module,
                     optimizer: torch.optim.Optimizer,
-                    path: str = "./checkpoints/") -> str:
+                    path_to_checkpoints: str = "./checkpoints/",
+                    prefix: str = "",
+                    suffix: str = "",
+                    extension: str = ".pth") -> Dict[str, str]:
     """
     Save Model and Optimizer checkpoint.
 
     Args:
         model (torch.nn.Module) : A pytorch model.
+
         optimizer (torch.optim) : A pytor optimizer.
-        path (str) : A path to save the checkpoints.
+
+        path_to_checkpoints (str) : A path to save the checkpoints.
+            Default = "./checkpoints/"
+
+        prefix (str) : A prefix to all checkpoint filenames.
+            Default = ""
+
+        suffix (str) : A suffix to all checkpoint filenames.
+            Default = ""
+
+        extension (str) : The checkpoint filename extension.
+            Default = ".pth"
 
     Returns:
-        () :
+        (Dict[str, str]) : A dictionary containing the paths to the checkpoints.
+
+                paths = {
+                    "model": str(path_to_models),
+                    "optimizer": str(path_to_optimizers)
+                }
 
     """
-    # TODO : Perhaps we need some identifiers or we could automatically create a folder by experiment.
-    raise NotImplementedError
+    # TODO : Extend this method to multiple models and optimizers.
+    # TODO : Decide where to create checkpoint folder if it doesn't exist.
+
+    # Models paths
+    path_to_models = Path(path_to_checkpoints) / "{}".format(prefix + "model" +
+                                                             suffix +
+                                                             extension)
+
+    # Optimizers paths
+    path_to_optimizers = Path(path_to_checkpoints) / "{}".format(
+        prefix + "optimizer" + suffix + extension)
+
+    # Save Models
+    torch.save(model.state_dict(), str(path_to_models))
+
+    # Save Optimizers
+    torch.save(optimizer.state_dict(), str(path_to_optimizers))
+
+    paths = {
+        "model": str(path_to_models),
+        "optimizer": str(path_to_optimizers)
+    }
+
+    return paths
 
 
-def load_from_checkpoint(model: torch.nn.Module, path_to_checkpoint: str):
+def load_from_checkpoint(model: torch.nn.Module,
+                         optimizer: torch.optim.Optimizer,
+                         device: torch.device, paths: Dict[str, str]):
     """
     Load from checkpoint.
 
     Args:
         model (torch.nn.Module) : A torch model.
 
-        path_to_checkpoint (str) : A path to checkpoint files.
+        optimizer (torch.optim.Optimizer) : A torch optimizer
+
+        device (torch.device) : A torch device
+
+        paths (Dict[str, str]) : A dictionary containing the paths to checkpoint
+            files.
+
+            paths = {
+                    "model": str(path_to_models),
+                    "optimizer": str(path_to_optimizers)
+                }
 
     Returns:
-        (torch.nn.Module) : A torch model.
+        (torch.nn.Module, torch.optim.Optimizer) : A tuple containing a torch model
+            and a torch optimizer.
 
     """
-    # TODO : We must first save model and optimizer states.
-    # TODO : We must then load model and optimizer states from checkpoint.
 
-    if path_to_checkpoint is not None and os.path.exists(path_to_checkpoint):
-        model.load_state_dict(torch.load(path_to_checkpoint))
+    model.load_state_dict(torch.load(paths["model"], map_location=device))
 
-    # Still work in progress.
-    raise NotImplementedError
+    optimizer.load_state_dict(
+        torch.load(paths["optimizer"], map_location=device))
+
+    checkpoint = {"model": model, "optimizer": optimizer}
+
+    return checkpoint
 
 
 def process_batch(batch: Union[Tuple[Tensor, ...], List[Tensor]]):
@@ -137,26 +194,28 @@ def process_batch(batch: Union[Tuple[Tensor, ...], List[Tensor]]):
 
     # TODO : We must update this method if we update the dataloader outputs.
     x = torch.stack(tensors=batch, dim=0).permute(dims=[0, 3, 1, 2]).float()
-    # x = batch.permute(dims=[0, 3, 1, 2]).float()
 
     return x
 
 
-def create_folders(path: str = "./output/") -> None:
+def create_folders(path: str = "./output/",
+                   parents: bool = False,
+                   exist_ok: bool = False) -> str:
     """
     Create folder.
+
+    https://docs.python.org/3.7/library/pathlib.html#pathlib.Path.mkdir
 
     Args :
         path (str): Path to the folder that's being created.
 
     """
-    # TODO : Document and extend this method.
-    # Try using pathlib.Path and its mkdir method.
 
-    if not os.path.exists(path):
-        os.mkdir(path)
+    absolute_path_to_folder = Path(path).absolute()
 
-    return
+    absolute_path_to_folder.mkdir(parents=parents, exist_ok=exist_ok)
+
+    return str(absolute_path_to_folder)
 
 
 def save_as_binary_dataset(*args, **kwargs):
