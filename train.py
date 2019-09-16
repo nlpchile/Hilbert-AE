@@ -1,69 +1,51 @@
 """Training Stage."""
 import os
+from pathlib import Path
 from typing import Dict, Union
 
 import torch
 
 from src.AutoEncoder import autoencoder, training_step
 from src.dataloaders.dataloaders import build_dataloader_from_disk
-from src.utils import create_folders, get_args, process_batch
+from src.utils import create_folders, get_kwargs, process_batch, set_config
 
-# python3 train.py --device="cpu" --hdf5_file="./dataset_HDF5.h5" --path_to_checkpoint="./checkpoints/" --epochs=10 --early_stop=5 --lr=0.001 --weight_decay=1e-5 --batch_size=256 --nc=1 --ld=256
+# Just run
+#           python3 train.py --config-file="./config.json"
 
 
-def train(args):
+def train(kwargs):
     """Train a Hilbert Autoencoder."""
     # Config Device
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu"
-                          ) if args.device is None else args.device
-
-    ###########################################################################
-    # Config JSONs
-    kwargs: Dict[str, Union[str, Dict[str, str]]] = {}
-
-    kwargs["build_dataloader_from_disk"] = {
-        "filename": args.hdf5_file,
-        "batch_size": args.batch_size,
-        "shuffle": True  # TODO : Add it to args
-    }
-
-    kwargs["autoencoder"] = {"nc": args.nc, "ndf": args.ld}
-
-    kwargs["optimizer"] = {
-        "lr": args.lr,
-        "betas": [0.9, 0.999],
-        "eps": 1e-8,
-        "weight_decay": args.weight_decay,
-        "amsgrad": False
-    }
-
-    kwargs["loss"] = {
-        "size_average": None,
-        "reduce": None,
-        "reduction": "mean"
-    }
-
-    ###########################################################################
+    device = set_config(
+        seed=kwargs["seed"],
+        device=kwargs["device"],
+        enforce_reproducibility=kwargs["enforce_reproducibility"])
 
     # Initialize Model
+    # TODO : Define a get_models() method that outputs a dictionary
     model = autoencoder(**kwargs["autoencoder"]).to(device)
 
-    # TODO : Defined as "load_from_checkpoint" in utils.
-    path_to_checkpoint = args.path_to_checkpoint
+    # TODO : Defined as "load_from_checkpoint()" in utils.
+    path_to_checkpoint = kwargs["path_to_checkpoints"]
     if path_to_checkpoint is not None and os.path.exists(path_to_checkpoint):
         model.load_state_dict(torch.load(path_to_checkpoint))
 
+    # TODO : Define a get_criterions() method that outputs a dictionary
     criterion = torch.nn.MSELoss(**kwargs["loss"])
 
+    # TODO : Define a get_optimizers() method that outputs a dictionary
     optimizer = torch.optim.Adam(params=model.parameters(),
                                  **kwargs["optimizer"])
 
+    # TODO : Define a get_dataloaders() method that outputs a dictionary
     train_loader = build_dataloader_from_disk(
         **kwargs["build_dataloader_from_disk"])
 
-    epochs = args.epochs
+    ###############################################################################
 
-    early_stop_limit = args.early_stop
+    epochs = kwargs["epochs"]
+
+    early_stop_limit = kwargs["early_stop"]
 
     early_stop_count = 0
 
@@ -71,6 +53,7 @@ def train(args):
 
     create_folders()
 
+    # TODO : Add this to config json
     best_path = "./output/HILBERT_AE_best.pth"
 
     for epoch in range(epochs):
@@ -97,7 +80,7 @@ def train(args):
 
         # ===================log========================
         # TODO : Add a tensorboard logger.
-        print('epoch [{}/{}], loss:{:.4f}'.format(epoch + 1, epochs,
+        print("epoch [{}/{}], loss:{:.4f}".format(epoch + 1, epochs,
                                                   loss_train.item() / idx))
         train_loss.append(loss_train.item() / idx)
 
@@ -117,8 +100,8 @@ def train(args):
     print("AutoEncoder was trained !!")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
-    args = get_args()
+    kwargs = get_kwargs()
 
-    train(args)
+    train(kwargs=kwargs)
