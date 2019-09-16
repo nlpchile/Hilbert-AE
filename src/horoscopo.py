@@ -10,50 +10,33 @@ from src.HilbertMapper import HilbertMapper
 
 # Try running "%run src/horoscopo.py" magic in IPython
 
-# TODO : Make an independent script to load the raw txt and save it as binary dataset .
+# TODO : Make an independent script to load the raw txt and save it as binary dataset.
 
-###############################################################################
-# TODO : we should aim to be able to load all configurations, or example, from a config JSON file
+# TODO : This is quite harcoded, we should infer the max sequence length from the dataset or truncate the sequences lenghs by this number
+max_sequence_length = 64
 
-# Configs
-# Language Model Dataset
-filename_raw = "./data/raw/horoscopo_raw.txt"
-max_number_of_examples = -1
-
-max_sequence_length = 64  # TODO : This is quite harcoded, we should infer the max sequence length from the dataset or truncate the sequences lenghs by this number
+# TODO : We should have this value precomputed.
 order = int(np.ceil(np.sqrt(max_sequence_length)))
 
-# DataLoader
-batch_size = 2
-shuffle = True
-
-# Path to binary dataset file
-path_to_dataset_HDF5 = "dataset_HDF5.h5"
-
-###############################################################################
+################################################################################
 # Config JSONs
-kwargs: Dict[str, Union[str, Dict[str, Union[List, str, int]], int]] = {}
-
-# Language Model Dataset
-kwargs["language_model_dataset"] = {
-    "filename": filename_raw,
-    "separator": " ",
-    "max_number_of_examples": max_number_of_examples
-}
-
-# Process file args
-kwargs["process_file"] = {
-    "output_file": path_to_dataset_HDF5,
-    "order": order,
-    "name": "hilbert",
-    "dtype": "int32"
-}
-
-# Build dataloader from disk
-kwargs["build_dataloader_from_disk"] = {
-    "filename": path_to_dataset_HDF5,
-    "batch_size": batch_size,
-    "shuffle": shuffle
+kwargs = {
+    "language_model_dataset": {
+        "filename": "./data/raw/horoscopo_raw.txt",
+        "separator": " ",
+        "max_number_of_examples": -1
+    },
+    "process_file": {
+        "output_file": "dataset_HDF5.h5",
+        "order": order,
+        "name": "hilbert",
+        "dtype": "int32"
+    },
+    "build_dataloader_from_disk": {
+        "filename": "dataset_HDF5.h5",
+        "batch_size": 2,
+        "shuffle": True
+    }
 }
 ################################################################################
 
@@ -62,8 +45,8 @@ kwargs["build_dataloader_from_disk"] = {
 language_model_dataset = LanguageModelDataset(
     **kwargs["language_model_dataset"])
 
-vocabulary_size = len(language_model_dataset.tokens
-                      )  # TODO : Perhaps we can have this values precomputed.
+# TODO : We should have this value precomputed.
+vocabulary_size = len(language_model_dataset.tokens)
 
 # We initialize our Hilbert Mapper (callable)
 hilbert_mapper = HilbertMapper(order=order, number_of_channels=vocabulary_size)
