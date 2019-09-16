@@ -2,11 +2,10 @@
 
 import argparse
 import os
+import typing
+from typing import List, Tuple, Union
 
 import torch
-from typing import Union, Tuple, List
-
-import typing
 
 Tensor = torch.Tensor
 
@@ -22,7 +21,7 @@ def get_args():
 
     parser.add_argument("--hdf5_file", type=str, help="Path to HDF5 file")
 
-    parser.add_argument("--checkpoint",
+    parser.add_argument("--path_to_checkpoint",
                         type=str,
                         default=None,
                         help="Path to Checkpoint Model")

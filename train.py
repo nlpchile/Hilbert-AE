@@ -8,6 +8,8 @@ from src.AutoEncoder import autoencoder, training_step
 from src.dataloaders.dataloaders import build_dataloader_from_disk
 from src.utils import create_folders, get_args, process_batch
 
+# python3 train.py --device="cpu" --hdf5_file="./dataset_HDF5.h5" --path_to_checkpoint="./checkpoints/" --epochs=10 --early_stop=5 --lr=0.001 --weight_decay=1e-5 --batch_size=256 --nc=1 --ld=256
+
 
 def train(args):
     """Train a Hilbert Autoencoder."""
