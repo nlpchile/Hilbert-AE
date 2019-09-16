@@ -111,7 +111,7 @@ class Encoder(torch.nn.Module):
         """
         super(Encoder, self).__init__()
 
-        self.model = model(**kwargs)
+        self.model = model
 
     def forward(self, x: Tensor) -> Tensor:
         """Encode an input x to a latent representation z."""
@@ -138,7 +138,7 @@ class Decoder(torch.nn.Module):
         """
         super(Decoder, self).__init__()
 
-        self.model = model(**kwargs)
+        self.model = model
 
     def forward(self, z: Tensor) -> Tensor:
         """Decode an input representation z into a representation y_hat."""
@@ -227,7 +227,6 @@ class convolutional_encoder(Encoder):
             ndf (int) : Output Channels.
 
         """
-        # super(convolutional_encoder, self).__init__()
 
         self.nc = nc
         self.ndf = ndf
@@ -240,7 +239,7 @@ class convolutional_encoder(Encoder):
         # Activation
         self.inplace: bool = True
 
-        self.model = torch.nn.Sequential(
+        model = torch.nn.Sequential(
             # input is (nc) x 32 x 32
             torch.nn.Conv2d(in_channels=self.nc,
                             out_channels=self.ndf,
@@ -279,10 +278,7 @@ class convolutional_encoder(Encoder):
                             bias=self.bias),
         )
 
-    # def forward(self, x: Tensor) -> Tensor:
-    #     """Encode an input x to a latent representation z."""
-    #     z = self.model(x)
-    #     return z
+        super(convolutional_encoder, self).__init__(model=model)
 
 
 class convolutional_decoder(Decoder):
@@ -312,7 +308,7 @@ class convolutional_decoder(Decoder):
         # Activation
         self.inplace: bool = True
 
-        self.model = torch.nn.Sequential(
+        model = torch.nn.Sequential(
             # state size. (ndf*4) x 4 x 4
             torch.nn.ConvTranspose2d(in_channels=self.ndf * 8,
                                      out_channels=self.ndf * 4,
@@ -352,10 +348,7 @@ class convolutional_decoder(Decoder):
                                      bias=self.bias),
         )
 
-    # def forward(self, z: Tensor):
-    #     """Decode an input representation z into a representation y_hat."""
-    #     y_hat = self.model(z)
-    #     return y_hat
+        super(convolutional_decoder, self).__init__(model=model)
 
 
 # Still compatible with older implementation
@@ -372,32 +365,12 @@ class autoencoder(Autoencoder):
             ndf (int) : Output Channels.
 
         """
-        # super(autoencoder, self).__init__()
 
         self.nc = nc
         self.ndf = ndf
 
-        self.encoder = convolutional_encoder(nc=self.nc,
-                                             ndf=self.ndf,
-                                             **kwargs)
+        encoder = convolutional_encoder(nc=self.nc, ndf=self.ndf, **kwargs)
 
-        self.decoder = convolutional_decoder(nc=self.nc,
-                                             ndf=self.ndf,
-                                             **kwargs)
+        decoder = convolutional_decoder(nc=self.nc, ndf=self.ndf, **kwargs)
 
-    # def forward(self, x: Tensor) -> Tuple[Tensor]:
-    #    """
-    #    Represent an input in an encoded space, then reconstructs it from it.
-    #
-    #    Args:
-    #        x [Tensor] : An input torch tensor.
-    #
-    #    Returns:
-    #        (Tuple[Tensor]) : A Tuple containing reconstructed input and
-    #                                its internal latent representation.
-    #
-    #    """
-    #    z = self.encoder(x)
-    #    x_hat = self.decoder(z)
-    #
-    #    return x_hat, z
+        super(autoencoder, self).__init__(encoder=encoder, decoder=decoder)
