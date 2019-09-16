@@ -131,10 +131,10 @@ def process_batch(batch: Union[Tuple[Tensor, ...], List[Tensor]]):
         (Tensor) : A processed torch Tensor.
 
     """
-    print(type(batch))
-    print(batch.shape)
 
+    # TODO : Uncomment this
     # batch = tuple(element for element in batch)
+
     # TODO : We must update this method if we update the dataloader outputs.
     x = torch.stack(tensors=batch, dim=0).permute(dims=[0, 3, 1, 2]).float()
     # x = batch.permute(dims=[0, 3, 1, 2]).float()
