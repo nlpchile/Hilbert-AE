@@ -8,7 +8,8 @@ from src.dataloaders.dataloaders import build_dataloader_from_disk
 from src.dataloaders.datasets import LanguageModelDataset, process_file
 from src.HilbertMapper import HilbertMapper
 
-# Try running "%run src/horoscopo.py" magic in IPython
+# Try running
+#               ipython -c "%run src/horoscopo.py"
 
 # TODO : Make an independent script to load the raw txt and save it as binary dataset.
 
