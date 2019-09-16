@@ -18,7 +18,7 @@ from src.HilbertMapper import HilbertMapper
 # Configs
 # Language Model Dataset
 filename_raw = "./data/raw/horoscopo_raw.txt"
-max_number_of_examples = 100
+max_number_of_examples = -1
 
 max_sequence_length = 64  # TODO : This is quite harcoded, we should infer the max sequence length from the dataset or truncate the sequences lenghs by this number
 order = int(np.ceil(np.sqrt(max_sequence_length)))
