@@ -1,71 +1,81 @@
 """This module implement the utils classes and methods."""
 
 import argparse
+import json
 import os
+import random
 import typing
 from typing import List, Tuple, Union
 
+import numpy as np
 import torch
 
 Tensor = torch.Tensor
 
 
-def get_args():
-    """Get Arguments from terminal."""
-    parser = argparse.ArgumentParser("Train Hilbert AutoEncoder")
+def get_kwargs():
 
-    parser.add_argument("--device",
+    parser = argparse.ArgumentParser(description="Path to Config File")
+
+    parser.add_argument("--config-file",
+                        default="./config.json",
                         type=str,
-                        default=None,
-                        help="torch device as a string")
-
-    parser.add_argument("--hdf5_file", type=str, help="Path to HDF5 file")
-
-    parser.add_argument("--path_to_checkpoint",
-                        type=str,
-                        default=None,
-                        help="Path to Checkpoint Model")
-
-    parser.add_argument("--epochs",
-                        type=int,
-                        default=100,
-                        help="Number of epochs")
-
-    parser.add_argument("--early_stop",
-                        type=int,
-                        default=40,
-                        help="Early stop limit")
-
-    parser.add_argument("--lr",
-                        type=float,
-                        default=0.001,
-                        help="learning rate")
-
-    parser.add_argument("--weight_decay",
-                        type=float,
-                        default=1e-5,
-                        help="weight decay to optimizer")
-
-    parser.add_argument("--batch_size",
-                        type=int,
-                        default=256,
-                        help="Batch size")
-
-    parser.add_argument("--nc",
-                        type=int,
-                        default=1,
-                        help="Number of channels in data")
-
-    parser.add_argument("--ld",
-                        type=int,
-                        default=256,
-                        help="latent dimension size")
-
-    args, _ = parser.parse_known_args()
+                        help="path to JSON file with configs")
 
     args = parser.parse_args()
 
-    return args
+    kwargs = {}
+
+    with open(args.config_file, "r") as json_file:
+        kwargs = json.load(json_file)
+
+    return kwargs
+
+
+def set_config(seed: int, device: torch.device,
+               enforce_reproducibility: bool) -> torch.device:
+
+    # Use the GPU if possible.
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu"
+                          ) if device is None else device
+
+    # Use CuDNN optimizations if possible,
+    # At the expense of potentially having an impact on reproducibility.
+    # https://pytorch.org/docs/stable/notes/randomness.html
+
+    if torch.cuda.is_available():
+
+        if enforce_reproducibility:
+            torch.backends.cudnn.deterministic = True
+            torch.backends.cudnn.benchmark = False
+
+        if not enforce_reproducibility:
+            # torch.backends.cudnn.deterministic = False
+            torch.backends.cudnn.benchmark = True
+
+    # I may be confused, but I think PyTorch by default uses half of the available threads,
+    # So, if that is True, then this should make it possible to use all available threads.
+    torch.set_num_threads(2 * os.cpu_count())
+
+    # Set the seeds for reproducibility
+
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+        torch.manual_seed(seed)
+    else:
+        torch.manual_seed(seed)
+
+    random.seed(seed)
+    np.random.seed(seed=seed)
+
+    # TODO : Replace prints with a logger
+    print(" PyTorch Version      : {} ".format(torch.__version__))
+    print(" Device               : {} ".format(device))
+    print(" Number of Threads    : {} ".format(torch.get_num_threads()))
+    print(" Seed                 : {} ".format(seed))
+
+    return device
 
 
 def save_checkpoint(model: torch.nn.Module,
@@ -121,8 +131,13 @@ def process_batch(batch: Union[Tuple[Tensor, ...], List[Tensor]]):
         (Tensor) : A processed torch Tensor.
 
     """
+    print(type(batch))
+    print(batch.shape)
+
+    # batch = tuple(element for element in batch)
     # TODO : We must update this method if we update the dataloader outputs.
-    x = torch.stack(batch).permute(dims=[0, 3, 1, 2]).float()
+    x = torch.stack(tensors=batch, dim=0).permute(dims=[0, 3, 1, 2]).float()
+    # x = batch.permute(dims=[0, 3, 1, 2]).float()
 
     return x
 
