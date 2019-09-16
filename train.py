@@ -4,10 +4,12 @@ from pathlib import Path
 from typing import Dict, Union
 
 import torch
+from torch.utils.tensorboard import SummaryWriter
 
 from src.AutoEncoder import autoencoder, training_step
 from src.dataloaders.dataloaders import build_dataloader_from_disk
-from src.utils import create_folders, get_kwargs, process_batch, set_config
+from src.utils import (create_folders, get_kwargs, load_from_checkpoint,
+                       process_batch, set_config)
 
 # Just run
 #           python3 train.py --config-file="./config.json"
@@ -15,6 +17,14 @@ from src.utils import create_folders, get_kwargs, process_batch, set_config
 
 def train(kwargs):
     """Train a Hilbert Autoencoder."""
+
+    # Create tensorboard log folder if it doesn't exist
+    path_to_tensorboard_logs = create_folders(
+        path=kwargs["path_to_tensorboard_logs"], parents=True, exist_ok=True)
+
+    # Tensorboard writer
+    writer = SummaryWriter(log_dir=path_to_tensorboard_logs)
+
     # Config Device
     device = set_config(
         seed=kwargs["seed"],
@@ -25,10 +35,22 @@ def train(kwargs):
     # TODO : Define a get_models() method that outputs a dictionary
     model = autoencoder(**kwargs["autoencoder"]).to(device)
 
-    # TODO : Defined as "load_from_checkpoint()" in utils.
-    path_to_checkpoint = kwargs["path_to_checkpoints"]
-    if path_to_checkpoint is not None and os.path.exists(path_to_checkpoint):
-        model.load_state_dict(torch.load(path_to_checkpoint))
+    # TODO : Add this in config.
+    #
+    # checkpoint_paths = {
+    #     "model": path_to_model_checkpoint,
+    #     "optimizer": path_to_optimizer_checkpoint
+    # }
+    #
+    # TODO : Replace with this.
+    # checkpoint = load_from_checkpoint(model=model,
+    #                                   optimizer=optimizer,
+    #                                   device=device,
+    #                                   paths=paths)
+
+    path_to_checkpoint = Path(kwargs["path_to_checkpoints"])
+    if path_to_checkpoint is not None and path_to_checkpoint.exists():
+        model.load_state_dict(torch.load(str(path_to_checkpoint)))
 
     # TODO : Define a get_criterions() method that outputs a dictionary
     criterion = torch.nn.MSELoss(**kwargs["loss"])
@@ -76,6 +98,8 @@ def train(kwargs):
 
             loss, output, latent = output["loss"], output["x_hat"], output["z"]
 
+            # TODO : Add a tensorboard logger
+
             loss_train += loss
 
         # ===================log========================
@@ -97,6 +121,7 @@ def train(kwargs):
         if early_stop_count > early_stop_limit:
             break
 
+    writer.close()
     print("AutoEncoder was trained !!")
 
 
