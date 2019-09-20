@@ -14,7 +14,7 @@ import torch
 Tensor = torch.Tensor
 
 
-def get_kwargs():
+def get_kwargs() -> Dict:
 
     parser = argparse.ArgumentParser(description="Path to Config File")
 
@@ -25,7 +25,7 @@ def get_kwargs():
 
     args = parser.parse_args()
 
-    kwargs = {}
+    kwargs: Dict = {}
 
     with open(args.config_file, "r") as json_file:
         kwargs = json.load(json_file)
@@ -114,6 +114,7 @@ def save_checkpoint(model: torch.nn.Module,
                 }
 
     """
+    # TODO : Add a flag to optionally save the optimizer if needed
     # TODO : Extend this method to multiple models and optimizers.
     # TODO : Decide where to create checkpoint folder if it doesn't exist.
 
@@ -166,7 +167,7 @@ def load_from_checkpoint(model: torch.nn.Module,
             and a torch optimizer.
 
     """
-
+    # TODO : Add a flag to optionally load the optimizer if needed
     model.load_state_dict(torch.load(paths["model"], map_location=device))
 
     optimizer.load_state_dict(
@@ -177,7 +178,7 @@ def load_from_checkpoint(model: torch.nn.Module,
     return checkpoint
 
 
-def process_batch(batch: Union[Tuple[Tensor, ...], List[Tensor]]):
+def process_batch(batch: Tensor) -> Tensor:
     """
     Process a torch Tensor batch.
 
@@ -188,12 +189,18 @@ def process_batch(batch: Union[Tuple[Tensor, ...], List[Tensor]]):
         (Tensor) : A processed torch Tensor.
 
     """
+    # input shape : [batch_size, order, order, vocabulary_size]
 
-    # TODO : Uncomment this
-    # batch = tuple(element for element in batch)
+    # torch.nn.conv2d module takes an input signal of shape :
+    #            (N, C_in, H_in, W_in)
+    # where
+    #           N is a batch size
+    #           C denotes a number of channels
+    #           H is a height of input planes in pixels,
+    #           W is width in pixels.
 
-    # TODO : We must update this method if we update the dataloader outputs.
-    x = torch.stack(tensors=batch, dim=0).permute(dims=[0, 3, 1, 2]).float()
+    # output shape : [batch_size, vocabulary_size, order, order]
+    x = batch.permute(dims=[0, 3, 1, 2]).float()
 
     return x
 
