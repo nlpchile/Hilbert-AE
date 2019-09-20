@@ -1,6 +1,6 @@
 {
     "build_dataloader_from_disk": {
-        "filename": "./dataset_HDF5.h5",
+        "filename": "./data/binary/dataset_HDF5.h5",
         "batch_size": 2,
         "shuffle": true
     },
