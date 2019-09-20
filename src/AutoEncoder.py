@@ -240,6 +240,14 @@ class convolutional_encoder(Encoder):
         self.inplace: bool = True
 
         model = torch.nn.Sequential(
+
+            # input is (nc) x 8 x 8
+            torch.nn.Upsample(size=(32, 32),
+                              scale_factor=None,
+                              mode="nearest",
+                              align_corners=None),
+            torch.nn.ReLU(inplace=self.inplace),
+
             # input is (nc) x 32 x 32
             torch.nn.Conv2d(in_channels=self.nc,
                             out_channels=self.ndf,
@@ -346,7 +354,11 @@ class convolutional_decoder(Decoder):
                                      stride=self.stride,
                                      padding=self.padding,
                                      bias=self.bias),
-        )
+            # input is (nc) x 32 x 32
+            torch.nn.Upsample(size=(8, 8),
+                              scale_factor=None,
+                              mode="bilinear",
+                              align_corners=False))
 
         super(convolutional_decoder, self).__init__(model=model)
 
