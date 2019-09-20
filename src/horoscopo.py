@@ -7,6 +7,7 @@ import numpy as np
 from src.dataloaders.dataloaders import build_dataloader_from_disk
 from src.dataloaders.datasets import LanguageModelDataset, process_file
 from src.HilbertMapper import HilbertMapper
+from src.utils import process_batch
 
 # Try running
 #               ipython -c "%run src/horoscopo.py"
@@ -61,20 +62,20 @@ info = {
 # print(info)
 
 # We process our dataset and export it as H5PY
-process_file(dataset=language_model_dataset,
-             mapper=hilbert_mapper,
-             vocabulary_size=vocabulary_size,
-             **kwargs["process_file"])
+_ = process_file(dataset=language_model_dataset,
+                 mapper=hilbert_mapper,
+                 vocabulary_size=vocabulary_size,
+                 **kwargs["process_file"])
 
 # We load the dataset from disk
 dataset = build_dataloader_from_disk(**kwargs["build_dataloader_from_disk"])
 
 for index, batch in enumerate(dataset):
 
+    # hilbert_map
     # shape : [batch_size, order, order, vocabulary_size]
-    hilbert_mapped_sequence = batch
 
-    print(hilbert_mapped_sequence.shape)
+    batch = process_batch(batch=batch)
 
     if index == 1:
         break
