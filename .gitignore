@@ -110,3 +110,6 @@ venv.bak/
 
 # mkdocs documentation
 /site
+
+# Tensorboard logs folder
+tensorboard_logs
