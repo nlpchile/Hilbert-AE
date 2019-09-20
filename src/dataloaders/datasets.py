@@ -1,5 +1,6 @@
 """This module implements the Datasets classes and methods."""
 
+from pathlib import Path
 from typing import Callable, List, Tuple, Union
 
 import h5py
@@ -172,7 +173,7 @@ def process_file(dataset: Dataset,
                  mapper: Callable = None,
                  name: str = "hilbert",
                  dtype: Union[str, type] = "int32",
-                 **kwargs) -> None:
+                 **kwargs) -> str:
     """
     Create a binary file from a given dataset.
 
@@ -193,14 +194,19 @@ def process_file(dataset: Dataset,
 
         vocabulary_size (int): Vocabulary size.
 
+    Returns:
+        (str) :  The absolute output filepath.
+
     """
     # TODO: Perhaps we could rename this method and process the input earlier, perhaps using the Callable mapper as an argument for the Dataset Class, and then infer the data shape also from the Dataset.
 
     # TODO: Perhaps we can get an item "shape" Tuple as input instead of an "order" and "vocabulary_size" argument.
     shape: Tuple = (order, order, vocabulary_size)
 
+    absolute_output_file_path = Path(output_file).absolute()
+
     # create output file
-    f = h5py.File(output_file, "w")
+    f = h5py.File(str(absolute_output_file_path), "w")
 
     current_buffer_size = 1
     current_buffer_allocation = 0
@@ -227,5 +233,4 @@ def process_file(dataset: Dataset,
 
         current_buffer_allocation += 1
 
-    # TODO : Return absolute output_path
-    return
+    return str(absolute_output_file_path)
