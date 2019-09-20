@@ -59,6 +59,8 @@ def train(kwargs: Dict) -> None:
 
     epochs = kwargs["epochs"]
 
+    iteration = 0
+
     for epoch in range(epochs):
 
         # We could save 1 batch specific batch in order to watch
@@ -83,8 +85,10 @@ def train(kwargs: Dict) -> None:
             # Logging Loss
             writer.add_scalar(tag="train/loss",
                               scalar_value=loss,
-                              global_step=iter,
+                              global_step=iteration,
                               walltime=None)
+
+            iteration += 1
 
     writer.close()
 
