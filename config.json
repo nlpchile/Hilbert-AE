@@ -26,8 +26,7 @@
     "seed": 42,
     "device": null,
     "enforce_reproducibility": false,
-    "epochs": 10,
-    "early_stop": 5,
+    "epochs": 100,
     "path_to_checkpoints": "./checkpoints/",
     "path_to_tensorboard_logs": "./tensorboard_logs/"
 }
