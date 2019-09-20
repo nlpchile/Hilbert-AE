@@ -1,5 +1,7 @@
 """Main applications of the currently implemented methods."""
 
+import json
+from pathlib import Path
 from typing import Any, Dict, List, Tuple, Union
 
 from src.AutoEncoder import autoencoder, training_step
@@ -10,17 +12,9 @@ from src.utils import process_batch, set_config
 #               ipython -c "%run src/horoscopo.py"
 
 # Config JSON
-kwargs: Dict = {}
+path_to_config_file = Path("./config.json").absolute()
 
-kwargs = {"seed": 42, "device": None, "enforce_reproducibility": False}
-
-kwargs["build_dataloader_from_disk"] = {
-    "filename": "./data/binary/dataset_HDF5.h5",
-    "batch_size": 2,
-    "shuffle": True
-}
-
-kwargs["autoencoder"] = {"nc": 13964, "ndf": 256}
+kwargs: Dict = json.load(fp=path_to_config_file.open())
 
 # Config Device
 device = set_config(seed=kwargs["seed"],
@@ -44,7 +38,7 @@ for index, batch in enumerate(dataset):
     batch = process_batch(batch=batch)
 
     # TODO : Currently the model expects a different input shape.
-    # output = model(batch)
+    output = model(batch)
 
     if index == 1:
         break
