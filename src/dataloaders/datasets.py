@@ -9,6 +9,7 @@ import torch
 from torch.utils.data import Dataset
 
 from src.dataloaders.Tokens import Tokens
+from src.utils import create_folders
 
 Tensor = torch.Tensor
 
@@ -167,7 +168,8 @@ class HilbertDataset(torch.utils.data.Dataset):
 
 
 def process_file(dataset: Dataset,
-                 output_file: str,
+                 output_folder: str,
+                 output_filename: str,
                  order: int,
                  vocabulary_size: int,
                  mapper: Callable = None,
@@ -180,7 +182,9 @@ def process_file(dataset: Dataset,
     Args:
         dataset (Dataset): A torch Dataset object.
 
-        output_file (str): A string with the output file name.
+        output_folder (str): A string with the output foldername.
+
+        output_filename (str): A string with the output file name.
 
         name (str) : Name of the dataset.
 
@@ -203,7 +207,13 @@ def process_file(dataset: Dataset,
     # TODO: Perhaps we can get an item "shape" Tuple as input instead of an "order" and "vocabulary_size" argument.
     shape: Tuple = (order, order, vocabulary_size)
 
-    absolute_output_file_path = Path(output_file).absolute()
+    absolute_path_to_folder = Path(output_folder).absolute()
+
+    path_to_folder = create_folders(path=str(absolute_path_to_folder),
+                                    parents=True,
+                                    exist_ok=True)
+
+    absolute_output_file_path = Path(path_to_folder) / output_filename
 
     # create output file
     f = h5py.File(str(absolute_output_file_path), "w")
