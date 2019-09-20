@@ -5,8 +5,6 @@ from src.HilbertMapper import HilbertMapper
 
 # Try running
 #               ipython -c "%run src/export_dataset.py"
-# Or run this script once
-#               python3
 
 # sequence_length = 64
 # order = int(np.ceil(np.sqrt(max_sequence_length)))
