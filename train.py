@@ -8,6 +8,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 from src.AutoEncoder import autoencoder, training_step
 from src.dataloaders.dataloaders import build_dataloader_from_disk
+from src.Meter import Accumulator
 from src.utils import (create_folders, get_kwargs, load_from_checkpoint,
                        process_batch, set_config)
 
@@ -61,13 +62,20 @@ def train(kwargs: Dict) -> None:
 
     iteration = 0
 
+    accumulate = Accumulator()
+
     for epoch in range(epochs):
+
+        accumulate.reset()
 
         # We could save 1 batch specific batch in order to watch
         # the evolution of its latent representation over the
         # training epochs.
 
         for idx, batch in enumerate(train_loader):
+
+            if idx == 0:
+                print("\n number of batches = {} \n".format(len(train_loader)))
 
             batch = batch.to(device)
 
@@ -82,13 +90,21 @@ def train(kwargs: Dict) -> None:
 
             loss, output, latent = output["loss"], output["x_hat"], output["z"]
 
-            # Logging Loss
-            writer.add_scalar(tag="train/loss",
-                              scalar_value=loss,
-                              global_step=iteration,
-                              walltime=None)
+            accumulate(loss)
+
+            # # Logging Loss
+            # writer.add_scalar(tag="train/loss",
+            #                   scalar_value=loss,
+            #                   global_step=iteration,
+            #                   walltime=None)
 
             iteration += 1
+
+        # Logging Loss
+        writer.add_scalar(tag="train/loss",
+                          scalar_value=accumulate.avg,
+                          global_step=epoch,
+                          walltime=None)
 
     writer.close()
 
