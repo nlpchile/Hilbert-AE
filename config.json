@@ -1,4 +1,21 @@
 {
+    "language_model_dataset": {
+        "filename": "./data/raw/horoscopo_raw.txt",
+        "separator": " ",
+        "max_number_of_examples": -1
+    },
+    "hilbert_mapper": {
+        "order": 8,
+        "number_of_channels": 13964
+    },
+    "process_file": {
+        "vocabulary_size": 13964,
+        "output_folder": "./data/binary/",
+        "output_filename": "dataset_HDF5.h5",
+        "order": 8,
+        "name": "hilbert",
+        "dtype": "int32"
+    },
     "build_dataloader_from_disk": {
         "filename": "./data/binary/dataset_HDF5.h5",
         "batch_size": 2,
