@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Dict, Union
 
 import torch
+from tqdm import tqdm
 from torch.utils.tensorboard import SummaryWriter
 
 from src.AutoEncoder import autoencoder, training_step
@@ -64,7 +65,7 @@ def train(kwargs: Dict) -> None:
 
     accumulate = Accumulator()
 
-    for epoch in range(epochs):
+    for epoch in tqdm(range(epochs), position=0, desc="epoch"):
 
         accumulate.reset()
 
@@ -72,10 +73,8 @@ def train(kwargs: Dict) -> None:
         # the evolution of its latent representation over the
         # training epochs.
 
-        for idx, batch in enumerate(train_loader):
-
-            if idx == 0:
-                print("\n number of batches = {} \n".format(len(train_loader)))
+        for idx, batch in enumerate(
+                tqdm(train_loader, position=1, desc="batch")):
 
             batch = batch.to(device)
 
