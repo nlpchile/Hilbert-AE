@@ -22,12 +22,13 @@ device = set_config(seed=kwargs["seed"],
                     enforce_reproducibility=kwargs["enforce_reproducibility"])
 
 # We load the dataset from disk
-dataset = build_dataloader_from_disk(**kwargs["build_dataloader_from_disk"])
+train_loader, dev_loader = build_dataloader_from_disk(
+    **kwargs["build_dataloader_from_disk"])
 
 # We initialize the model
 model = autoencoder(**kwargs["autoencoder"]).to(device)
 
-for index, batch in enumerate(dataset):
+for index, batch in enumerate(train_loader):
 
     # shape : [batch_size, order, order, vocabulary_size]
     # batch = hilbert_map
