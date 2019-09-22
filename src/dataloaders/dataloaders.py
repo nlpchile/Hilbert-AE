@@ -7,6 +7,7 @@ from torch.utils.data import DataLoader, random_split
 
 from src.dataloaders.datasets import HilbertDataset, LanguageModelDataset
 from src.dataloaders.PadCollate import PadCollate
+from src.utils import get_train_dev_sets
 
 
 # TODO : Check if having batch_first = False as default still makes sense.
@@ -153,7 +154,10 @@ def HilbertDataLoader(filename: str, **kwargs):
 def build_dataloader_from_disk(filename: str,
                                batch_size: int,
                                shuffle: bool = True,
-                               **kwargs) -> torch.utils.data.DataLoader:
+                               dev_split: float = 0.1,
+                               num_workers: int = 0,
+                               drop_last: bool = True,
+                               **kwargs) -> Tuple[DataLoader, DataLoader]:
     """
 
     Build the dataloader from disk file.
@@ -163,17 +167,37 @@ def build_dataloader_from_disk(filename: str,
 
         batch_size (int) : Number of items in a batch.
 
-         shuffle (bool) : If True, it shuffles the dataset. Default = True.
+        shuffle (bool) : If True, it shuffles the dataset. Default = True.
 
     Returns:
         (torch.utils.data.Dataloader) : It returns a torch DataLoader.
 
     """
-    # TODO : Get dataset from args
-    dataloader = torch.utils.data.DataLoader(
-        HilbertDataLoader(filename=filename),
-        batch_size=batch_size,
-        shuffle=shuffle,
-    )
+    dataset = HilbertDataset(filename=filename)
 
-    return dataloader
+    (train_set, dev_set) = get_train_dev_sets(dataset=dataset,
+                                              dev_split=dev_split)
+
+    # Data Loaders
+    train_loader = DataLoader(train_set,
+                              batch_size=batch_size,
+                              shuffle=shuffle,
+                              num_workers=num_workers,
+                              drop_last=drop_last)
+
+    dev_loader = DataLoader(dev_set,
+                            batch_size=batch_size,
+                            shuffle=shuffle,
+                            num_workers=num_workers,
+                            drop_last=drop_last)
+
+    ## TODO : Get dataset from args
+    # dataloader = torch.utils.data.DataLoader(
+    #     HilbertDataLoader(filename=filename),
+    #     batch_size=batch_size,
+    #     shuffle=shuffle,
+    # )
+    #
+    # return dataloader
+
+    return (train_loader, dev_loader)
