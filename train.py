@@ -8,19 +8,20 @@ from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
 from src.AutoEncoder import autoencoder, training_step, validation_step
+from src.dataloaders.dataloaders import build_dataloader_from_disk
 from src.Meter import Accumulator
 from src.utils import (create_folders, get_kwargs, load_from_checkpoint,
                        process_batch, set_config)
 
-# HDF5 concurrent reads aren't safe
-# Workarround :
-try:
-    import torch.multiprocessing as mp
-    mp.set_start_method('spawn')
-    from src.dataloaders.dataloaders import build_dataloader_from_disk
-except RuntimeError:
-    from src.dataloaders.dataloaders import build_dataloader_from_disk
-    pass
+## HDF5 concurrent reads aren't safe
+# Workarround still raises "TypeError: h5py objects cannot be pickled"
+# try:
+#     import torch.multiprocessing as mp
+#     mp.set_start_method("spawn")
+#     from src.dataloaders.dataloaders import build_dataloader_from_disk
+# except RuntimeError:
+#     from src.dataloaders.dataloaders import build_dataloader_from_disk
+#     pass
 
 # Install requirements :
 #           pip3 install -r requirements.txt

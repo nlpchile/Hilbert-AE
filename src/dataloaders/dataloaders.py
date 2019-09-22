@@ -173,6 +173,12 @@ def build_dataloader_from_disk(filename: str,
         (torch.utils.data.Dataloader) : It returns a torch DataLoader.
 
     """
+    if num_workers != 1:
+        # HDF5 concurrent reads aren't safe
+        raise NotImplementedError(
+            "A way to safely handle num_workers != 1 has not been implemented yet."
+        )
+
     dataset = HilbertDataset(filename=filename)
 
     (train_set, dev_set) = get_train_dev_sets(dataset=dataset,
