@@ -100,7 +100,7 @@ class HilbertMapper:
                               hilbert map.
 
         """
-        # TODO : It should recieve a sequence of embeddings instead of integers.
+        # TODO : It could recieve a sequence of embeddings instead of integers.
 
         output_shape = (*hilbert_map.shape, number_of_channels)
 
