@@ -242,10 +242,12 @@ class convolutional_encoder(Encoder):
         model = torch.nn.Sequential(
 
             # input is (nc) x 8 x 8
-            torch.nn.Upsample(size=(32, 32),
-                              scale_factor=None,
-                              mode="nearest",
-                              align_corners=None),
+            torch.nn.Upsample(
+                size=(32, 32),
+                #scale_factor=None,
+                mode="nearest",
+                #align_corners=None
+            ),
             torch.nn.ReLU(inplace=self.inplace),
 
             # input is (nc) x 32 x 32
