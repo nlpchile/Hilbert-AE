@@ -1,4 +1,7 @@
 # import numpy as np
+import json
+from pathlib import Path
+from typing import Dict
 
 from src.dataloaders.datasets import LanguageModelDataset, process_file
 from src.HilbertMapper import HilbertMapper
@@ -10,25 +13,9 @@ from src.HilbertMapper import HilbertMapper
 # order = int(np.ceil(np.sqrt(max_sequence_length)))
 
 # Config JSON
-kwargs = {
-    "language_model_dataset": {
-        "filename": "./data/raw/horoscopo_raw.txt",
-        "separator": " ",
-        "max_number_of_examples": -1
-    },
-    "hilbert_mapper": {
-        "order": 8,
-        "number_of_channels": 13964
-    },
-    "process_file": {
-        "vocabulary_size": 13964,
-        "output_folder": "./data/binary/",
-        "output_filename": "dataset_HDF5.h5",
-        "order": 8,
-        "name": "hilbert",
-        "dtype": "int32"
-    }
-}
+path_to_config_file = Path("./config.json").absolute()
+
+kwargs: Dict = json.load(fp=path_to_config_file.open())
 
 # We initialize our Language Model Dataset
 # TODO : We could implement a "get_dataset(**kwargs)" method, in order to choose the desired dataset from config files too
