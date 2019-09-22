@@ -1,9 +1,10 @@
+import json
 import os
 import re
-import json
-import torch
-import numpy as np
+
 import h5py
+import numpy as np
+import torch
 
 
 def remove_numbers(text):
