@@ -10,6 +10,7 @@ from typing import Dict, List, Tuple, Union
 
 import numpy as np
 import torch
+from torch.utils.data import Dataset, random_split
 
 Tensor = torch.Tensor
 
@@ -77,6 +78,20 @@ def set_config(seed: int, device: torch.device,
     print(" Seed                 : {} ".format(seed))
 
     return device
+
+
+def get_train_dev_sets(dataset: Dataset,
+                       dev_split: float = 0.1) -> Tuple[Dataset, ...]:
+
+    # Random Split
+    train_split = 1.0 - dev_split
+    train_size = int(train_split * len(dataset))
+    dev_size = len(dataset) - train_size
+
+    # https://pytorch.org/docs/stable/data.html#torch.utils.data.random_split
+    train_set, dev_set = random_split(dataset=dataset,
+                                      lengths=[train_size, dev_size])
+    return (train_set, dev_set)
 
 
 def save_checkpoint(model: torch.nn.Module,
