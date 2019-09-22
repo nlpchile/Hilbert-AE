@@ -21,7 +21,7 @@
         "batch_size": 32,
         "shuffle": true,
         "dev_split": 0.1,
-        "num_workers": 0,
+        "num_workers": 2,
         "drop_last": true
     },
     "autoencoder": {
