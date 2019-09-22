@@ -37,7 +37,6 @@ for index, batch in enumerate(dataset):
     # shape : [batch_size, vocabulary_size, order, order]
     batch = process_batch(batch=batch)
 
-    # TODO : Currently the model expects a different input shape.
     output = model(batch)
 
     if index == 1:
