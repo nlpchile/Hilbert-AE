@@ -13,6 +13,14 @@ from src.Meter import Accumulator
 from src.utils import (create_folders, get_kwargs, load_from_checkpoint,
                        process_batch, set_config)
 
+try:
+    from apex import amp
+    assert torch.backends.cudnn.enabled, "Amp requires cudnn backend to be enabled."
+    opt_level = "01"
+
+except ImportError:
+    pass
+
 ## HDF5 concurrent reads aren't safe
 # Workarround still raises "TypeError: h5py objects cannot be pickled"
 # try:
@@ -62,6 +70,13 @@ def train(kwargs: Dict) -> None:
     # TODO : Define a get_optimizers() method that outputs a dictionary
     optimizer = torch.optim.Adam(params=model.parameters(),
                                  **kwargs["optimizer"])
+
+    try:
+        model, optimizer = amp.initialize(model,
+                                          optimizer,
+                                          opt_level=opt_level)
+    except:
+        pass
 
     # TODO : Define a get_dataloaders() method that outputs a dictionary
     train_loader, dev_loader = build_dataloader_from_disk(

@@ -5,6 +5,13 @@ import torch
 
 Tensor = torch.Tensor
 
+try:
+    from apex import amp
+    APEX_IS_AVAILABLE = True
+except ImportError:
+    APEX_IS_AVAILABLE = False
+    pass
+
 
 # Training
 def training_step(model: torch.nn.Module, x: Tensor,
@@ -46,7 +53,11 @@ def training_step(model: torch.nn.Module, x: Tensor,
     loss = criterion(x_hat, x)
 
     # Backward
-    loss.backward()
+    if APEX_IS_AVAILABLE:
+        with amp.scale_loss(loss, optimizer) as scaled_loss:
+            scaled_loss.backward()
+    else:
+        loss.backward()
 
     # Step
     optimizer.step()
