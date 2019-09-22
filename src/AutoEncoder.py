@@ -56,8 +56,20 @@ def training_step(model: torch.nn.Module, x: Tensor,
     if APEX_IS_AVAILABLE:
         with amp.scale_loss(loss, optimizer) as scaled_loss:
             scaled_loss.backward()
+            # Gradients are unscaled during context manager exit.
+
+        #  Now it's safe to clip.  Replace
+        #       torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=max_norm, norm_type=2)
+
+        # with
+        #       torch.nn.utils.clip_grad_norm_(amp.master_params(optimizer), max_norm)
+
+        # or
+        #       torch.nn.utils.clip_grad_value_(amp.master_params(optimizer), max_)
+
     else:
         loss.backward()
+        # torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=max_norm, norm_type=2)
 
     # Step
     optimizer.step()
