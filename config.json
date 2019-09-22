@@ -18,7 +18,7 @@
     },
     "build_dataloader_from_disk": {
         "filename": "./data/binary/dataset_HDF5.h5",
-        "batch_size": 128,
+        "batch_size": 32,
         "shuffle": true
     },
     "autoencoder": {
