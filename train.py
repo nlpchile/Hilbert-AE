@@ -63,11 +63,11 @@ def train(kwargs: Dict) -> None:
 
     iteration = 0
 
-    accumulate = Accumulator()
+    training_loss_acumulator = Accumulator()
 
     for epoch in tqdm(range(epochs), position=0, desc="epoch"):
 
-        accumulate.reset()
+        training_loss_acumulator.reset()
 
         # We could save 1 batch specific batch in order to watch
         # the evolution of its latent representation over the
@@ -89,7 +89,7 @@ def train(kwargs: Dict) -> None:
 
             loss, output, latent = output["loss"], output["x_hat"], output["z"]
 
-            accumulate(loss)
+            training_loss_acumulator(value=loss)
 
             # # Logging Loss
             # writer.add_scalar(tag="train/loss",
@@ -101,7 +101,7 @@ def train(kwargs: Dict) -> None:
 
         # Logging Loss
         writer.add_scalar(tag="train/loss",
-                          scalar_value=accumulate.avg,
+                          scalar_value=training_loss_acumulator.avg,
                           global_step=epoch,
                           walltime=None)
 
