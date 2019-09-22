@@ -7,7 +7,7 @@ import torch
 from tqdm import tqdm
 from torch.utils.tensorboard import SummaryWriter
 
-from src.AutoEncoder import autoencoder, training_step
+from src.AutoEncoder import autoencoder, training_step, validation_step
 from src.dataloaders.dataloaders import build_dataloader_from_disk
 from src.Meter import Accumulator
 from src.utils import (create_folders, get_kwargs, load_from_checkpoint,
@@ -54,32 +54,30 @@ def train(kwargs: Dict) -> None:
                                  **kwargs["optimizer"])
 
     # TODO : Define a get_dataloaders() method that outputs a dictionary
-    train_loader = build_dataloader_from_disk(
+    train_loader, dev_loader = build_dataloader_from_disk(
         **kwargs["build_dataloader_from_disk"])
 
     ###############################################################################
 
     epochs = kwargs["epochs"]
 
-    iteration = 0
-
-    training_loss_acumulator = Accumulator()
+    training_loss_accumulator = Accumulator()
+    validation_loss_accumulator = Accumulator()
 
     for epoch in tqdm(range(epochs), position=0, desc="epoch"):
-
-        training_loss_acumulator.reset()
 
         # We could save 1 batch specific batch in order to watch
         # the evolution of its latent representation over the
         # training epochs.
 
+        # TRAINING
+        training_loss_accumulator.reset()
+
         for idx, batch in enumerate(
-                tqdm(train_loader, position=1, desc="batch")):
+                tqdm(train_loader, position=1, desc="train batch")):
 
             batch = batch.to(device)
-
             batch = process_batch(batch=batch)
-
             x = batch
 
             output = training_step(model=model,
@@ -89,19 +87,33 @@ def train(kwargs: Dict) -> None:
 
             loss, output, latent = output["loss"], output["x_hat"], output["z"]
 
-            training_loss_acumulator(value=loss)
+            training_loss_accumulator(value=loss)
 
-            # # Logging Loss
-            # writer.add_scalar(tag="train/loss",
-            #                   scalar_value=loss,
-            #                   global_step=iteration,
-            #                   walltime=None)
-
-            iteration += 1
-
-        # Logging Loss
+        # Logging Training Loss
         writer.add_scalar(tag="train/loss",
-                          scalar_value=training_loss_acumulator.avg,
+                          scalar_value=training_loss_accumulator.avg,
+                          global_step=epoch,
+                          walltime=None)
+
+        # VALIDATION
+        validation_loss_accumulator.reset()
+
+        for jdx, batch in enumerate(
+                tqdm(dev_loader, position=2, desc="dev batch")):
+
+            batch = batch.to(device)
+            batch = process_batch(batch=batch)
+            x = batch
+
+            output = validation_step(model=model, x=x, criterion=criterion)
+
+            loss, output, latent = output["loss"], output["x_hat"], output["z"]
+
+            validation_loss_accumulator(value=loss)
+
+        # Logging Validation Loss
+        writer.add_scalar(tag="dev/loss",
+                          scalar_value=validation_loss_accumulator.avg,
                           global_step=epoch,
                           walltime=None)
 
