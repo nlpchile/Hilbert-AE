@@ -6,9 +6,6 @@ from typing import Dict, Union
 import torch
 from torch.utils.tensorboard import SummaryWriter
 
-# TODO : Select the right tqdm for a jupyter notebook or a python console
-from tqdm import tqdm
-
 from src.AutoEncoder import (autoencoder, simple_autoencoder, training_step,
                              validation_step)
 from src.dataloaders.dataloaders import build_dataloader_from_disk
@@ -48,6 +45,11 @@ except ImportError:
 
 def train(kwargs: Dict) -> None:
     """Train a Hilbert Autoencoder."""
+
+    if kwargs["notebook"]:
+        from tqdm.autonotebook import tqdm
+    else:
+        from tqdm import tqdm
 
     # Create tensorboard log folder if it doesn't exist
     path_to_tensorboard_logs = create_folders(

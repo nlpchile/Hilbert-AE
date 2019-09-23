@@ -24,12 +24,20 @@ def get_kwargs() -> Dict:
                         type=str,
                         help="path to JSON file with configs")
 
+    parser.add_argument(
+        "--notebook",
+        action="store_true",
+        default=False,
+        help="Use this flag when running inside a jupyter notebook or alike.")
+
     args = parser.parse_args()
 
     kwargs: Dict = {}
 
     with open(args.config_file, "r") as json_file:
         kwargs = json.load(json_file)
+
+    kwargs["notebook"] = args.notebook
 
     return kwargs
 
