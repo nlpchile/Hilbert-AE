@@ -7,11 +7,12 @@ import torch
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
-from src.AutoEncoder import autoencoder, training_step, validation_step
+from src.AutoEncoder import (autoencoder, simple_autoencoder, training_step,
+                             validation_step)
 from src.dataloaders.dataloaders import build_dataloader_from_disk
 from src.Meter import Accumulator
 from src.utils import (create_folders, get_kwargs, load_from_checkpoint,
-                       process_batch, set_config)
+                       process_batch, save_checkpoint, set_config)
 
 try:
     from apex import amp
@@ -64,7 +65,9 @@ def train(kwargs: Dict) -> None:
 
     # Initialize Model
     # TODO : Define a get_models() method that outputs a dictionary
-    model = autoencoder(**kwargs["autoencoder"]).to(device)
+
+    # model = autoencoder(**kwargs["autoencoder"]).to(device)
+    model = simple_autoencoder(**kwargs["simple_autoencoder"]).to(device)
 
     # TODO : Define a get_criterions() method that outputs a dictionary
     criterion = torch.nn.MSELoss(**kwargs["loss"])
@@ -88,10 +91,27 @@ def train(kwargs: Dict) -> None:
 
     epochs = kwargs["epochs"]
 
+    best_validation_loss = float("inf")
+    best_epoch = -1
+
     training_loss_accumulator = Accumulator()
     validation_loss_accumulator = Accumulator()
 
     for epoch in tqdm(range(epochs), position=0, desc="epoch"):
+
+        # Logging Model Weights
+        # TODO : Add a "log_every" configurable parameter,
+        # to avoid taking up all storage with the tensorboard logs.
+        for module, module_name in zip([model.encoder, model.decoder],
+                                       ["Encoder", "Decoder"]):
+
+            for name, param in module.named_parameters():
+                writer.add_histogram(tag=module_name + "/" + name,
+                                     values=param,
+                                     global_step=epoch,
+                                     bins="tensorflow",
+                                     walltime=None,
+                                     max_bins=None)
 
         # We could save 1 batch specific batch in order to watch
         # the evolution of its latent representation over the
@@ -143,6 +163,22 @@ def train(kwargs: Dict) -> None:
                           scalar_value=validation_loss_accumulator.avg,
                           global_step=epoch,
                           walltime=None)
+
+        # Saving Best Model according to the Validation Error
+        # TODO : Support save checkpoints when using APEX : https://github.com/NVIDIA/apex#checkpointing
+        if validation_loss_accumulator.avg < best_validation_loss:
+
+            best_validation_loss = validation_loss_accumulator.avg
+            best_epoch = epoch
+
+            # suffix = "_epoch_{}".format(epoch)
+            _ = save_checkpoint(
+                model=model,
+                optimizer=optimizer,
+                path_to_checkpoints=kwargs["path_to_checkpoints"],
+                prefix="",
+                suffix="_best",
+                extension=".pth")
 
     writer.close()
 
