@@ -5,6 +5,8 @@ from typing import Dict, Union
 
 import torch
 from torch.utils.tensorboard import SummaryWriter
+
+# TODO : Select the right tqdm for a jupyter notebook or a python console
 from tqdm import tqdm
 
 from src.AutoEncoder import (autoencoder, simple_autoencoder, training_step,
