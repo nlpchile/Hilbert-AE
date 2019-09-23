@@ -287,7 +287,7 @@ class convolutional_encoder(Encoder):
                             stride=self.stride,
                             padding=self.padding,
                             bias=self.bias),
-            torch.nn.BatchNorm2d(ndf * 2),
+            torch.nn.BatchNorm2d(num_features=ndf * 2),
             torch.nn.ReLU(inplace=self.inplace),
 
             # state size. (ndf*2) x 8 x 8
@@ -297,7 +297,7 @@ class convolutional_encoder(Encoder):
                             stride=self.stride,
                             padding=self.padding,
                             bias=self.bias),
-            torch.nn.BatchNorm2d(ndf * 4),
+            torch.nn.BatchNorm2d(num_features=ndf * 4),
             torch.nn.ReLU(inplace=self.inplace),
 
             # state size. (ndf*4) x 4 x 4
@@ -440,12 +440,16 @@ class simple_encoder(Encoder):
                                 padding=1,
                                 bias=True)
 
+        batchnorm1 = torch.nn.BatchNorm2d(num_features=64)
+
         conv2 = torch.nn.Conv2d(in_channels=64,
                                 out_channels=32,
                                 kernel_size=3,
                                 stride=2,
                                 padding=1,
                                 bias=True)
+
+        batchnorm2 = torch.nn.BatchNorm2d(num_features=32)
 
         conv3 = torch.nn.Conv2d(in_channels=32,
                                 out_channels=16,
@@ -454,12 +458,17 @@ class simple_encoder(Encoder):
                                 padding=1,
                                 bias=True)
 
+        batchnorm3 = torch.nn.BatchNorm2d(num_features=16)
+
         reshape = Reshape(shape=(-1, 16))
+
+        linear = torch.nn.Linear(in_features=16, out_features=16, bias=True)
 
         relu = torch.nn.ReLU(inplace=True)
 
-        model = torch.nn.Sequential(reduce, relu, conv1, relu, conv2, relu,
-                                    conv3, relu, reshape)
+        model = torch.nn.Sequential(reduce, relu, conv1, batchnorm1, relu,
+                                    conv2, batchnorm2, relu, conv3, batchnorm3,
+                                    relu, reshape, linear)
 
         super(simple_encoder, self).__init__(model=model)
 
@@ -483,6 +492,8 @@ class simple_decoder(Decoder):
                                          padding=1,
                                          bias=True)
 
+        batchnorm1 = torch.nn.BatchNorm2d(num_features=32)
+
         conv2 = torch.nn.ConvTranspose2d(in_channels=32,
                                          out_channels=64,
                                          kernel_size=4,
@@ -490,12 +501,16 @@ class simple_decoder(Decoder):
                                          padding=1,
                                          bias=True)
 
+        batchnorm2 = torch.nn.BatchNorm2d(num_features=64)
+
         conv3 = torch.nn.ConvTranspose2d(in_channels=64,
                                          out_channels=128,
                                          kernel_size=4,
                                          stride=2,
                                          padding=1,
                                          bias=True)
+
+        batchnorm3 = torch.nn.BatchNorm2d(num_features=128)
 
         downsample = torch.nn.Upsample(size=(8, 8),
                                        scale_factor=None,
@@ -511,10 +526,9 @@ class simple_decoder(Decoder):
 
         relu = torch.nn.ReLU(inplace=True)
 
-        # out = reduce(relu(upsample(batch)))
-
-        model = torch.nn.Sequential(reshape, upsample, relu, conv1, relu,
-                                    conv2, relu, conv3, relu, downsample, relu,
+        model = torch.nn.Sequential(reshape, upsample, relu, conv1, batchnorm1,
+                                    relu, conv2, batchnorm2, relu, conv3,
+                                    batchnorm3, relu, downsample, relu,
                                     increase)
 
         super(simple_decoder, self).__init__(model=model)
