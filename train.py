@@ -101,7 +101,7 @@ def train(kwargs: Dict) -> None:
     training_loss_accumulator = Accumulator()
     validation_loss_accumulator = Accumulator()
 
-    for epoch in tqdm(range(epochs), position=0, desc="epoch", unit="epochs"):
+    for epoch in tqdm(range(epochs), position=0, desc="epoch", unit="epoch"):
 
         # Logging Model Weights
         # TODO : Add a "log_every" configurable parameter,
@@ -125,10 +125,7 @@ def train(kwargs: Dict) -> None:
         training_loss_accumulator.reset()
 
         for idx, batch in enumerate(
-                tqdm(train_loader,
-                     position=0,
-                     desc="train batch",
-                     unit="batches")):
+                tqdm(train_loader, position=0, desc="train", unit="batch")):
 
             batch = batch.to(device)
             batch = process_batch(batch=batch)
@@ -153,7 +150,7 @@ def train(kwargs: Dict) -> None:
         validation_loss_accumulator.reset()
 
         for jdx, batch in enumerate(
-                tqdm(dev_loader, position=0, desc="dev batch")):
+                tqdm(dev_loader, position=0, desc="dev", unit="batch")):
 
             batch = batch.to(device)
             batch = process_batch(batch=batch)
