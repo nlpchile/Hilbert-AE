@@ -131,8 +131,11 @@ def save_checkpoint(model: torch.nn.Module,
     """
     # TODO : Add a flag to optionally save the optimizer if needed
     # TODO : Extend this method to multiple models and optimizers.
-    # TODO : Decide where to create checkpoint folder if it doesn't exist.
     # TODO : Support save checkpoints when using APEX : https://github.com/NVIDIA/apex#checkpointing
+
+    # We create a folder to save the checkpoints, if it doesn't already exist
+    _ = create_folders(path=path_to_checkpoints, parents=True, exist_ok=True)
+
     # Models paths
     path_to_models = Path(path_to_checkpoints) / "{}".format(prefix + "model" +
                                                              suffix +
