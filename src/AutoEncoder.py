@@ -409,3 +409,124 @@ class autoencoder(Autoencoder):
         decoder = convolutional_decoder(nc=self.nc, ndf=self.ndf, **kwargs)
 
         super(autoencoder, self).__init__(encoder=encoder, decoder=decoder)
+
+
+class Reshape(torch.nn.Module):
+    def __init__(self, shape: Tuple[int, ...], **kwargs) -> None:
+        super(Reshape, self).__init__()
+
+        self.shape = shape
+
+    def forward(self, x: Tensor) -> Tensor:
+        return x.reshape(self.shape)
+
+
+class simple_encoder(Encoder):
+    def __init__(self, num_channels: int, **kwargs) -> None:
+
+        self.num_channels = num_channels
+
+        reduce = torch.nn.Conv2d(in_channels=self.num_channels,
+                                 out_channels=128,
+                                 kernel_size=(1, 1),
+                                 stride=1,
+                                 padding=0,
+                                 bias=True)
+
+        conv1 = torch.nn.Conv2d(in_channels=128,
+                                out_channels=64,
+                                kernel_size=3,
+                                stride=2,
+                                padding=1,
+                                bias=True)
+
+        conv2 = torch.nn.Conv2d(in_channels=64,
+                                out_channels=32,
+                                kernel_size=3,
+                                stride=2,
+                                padding=1,
+                                bias=True)
+
+        conv3 = torch.nn.Conv2d(in_channels=32,
+                                out_channels=16,
+                                kernel_size=3,
+                                stride=2,
+                                padding=1,
+                                bias=True)
+
+        reshape = Reshape(shape=(-1, 16))
+
+        relu = torch.nn.ReLU(inplace=True)
+
+        model = torch.nn.Sequential(reduce, relu, conv1, relu, conv2, relu,
+                                    conv3, relu, reshape)
+
+        super(simple_encoder, self).__init__(model=model)
+
+
+class simple_decoder(Decoder):
+    def __init__(self, num_channels: int, **kwargs) -> None:
+
+        self.num_channels = num_channels
+
+        reshape = Reshape(shape=(-1, 16, 1, 1))
+
+        upsample = torch.nn.Upsample(size=(4, 4),
+                                     scale_factor=None,
+                                     mode="bilinear",
+                                     align_corners=False)
+
+        conv1 = torch.nn.ConvTranspose2d(in_channels=16,
+                                         out_channels=32,
+                                         kernel_size=4,
+                                         stride=2,
+                                         padding=1,
+                                         bias=True)
+
+        conv2 = torch.nn.ConvTranspose2d(in_channels=32,
+                                         out_channels=64,
+                                         kernel_size=4,
+                                         stride=2,
+                                         padding=1,
+                                         bias=True)
+
+        conv3 = torch.nn.ConvTranspose2d(in_channels=64,
+                                         out_channels=128,
+                                         kernel_size=4,
+                                         stride=2,
+                                         padding=1,
+                                         bias=True)
+
+        downsample = torch.nn.Upsample(size=(8, 8),
+                                       scale_factor=None,
+                                       mode="bilinear",
+                                       align_corners=False)
+
+        increase = torch.nn.Conv2d(in_channels=128,
+                                   out_channels=self.num_channels,
+                                   kernel_size=(1, 1),
+                                   stride=1,
+                                   padding=0,
+                                   bias=True)
+
+        relu = torch.nn.ReLU(inplace=True)
+
+        # out = reduce(relu(upsample(batch)))
+
+        model = torch.nn.Sequential(reshape, upsample, relu, conv1, relu,
+                                    conv2, relu, conv3, relu, downsample, relu,
+                                    increase)
+
+        super(simple_decoder, self).__init__(model=model)
+
+
+class simple_autoencoder(Autoencoder):
+    def __init__(self, num_channels: int, **kwargs) -> None:
+
+        self.num_channels = num_channels
+
+        encoder = simple_encoder(num_channels=self.num_channels)
+        decoder = simple_decoder(num_channels=self.num_channels)
+
+        super(simple_autoencoder, self).__init__(encoder=encoder,
+                                                 decoder=decoder)
