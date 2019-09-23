@@ -17,7 +17,7 @@ try:
     from apex import amp
     APEX_IS_AVAILABLE = True
     assert torch.backends.cudnn.enabled, "Amp requires cudnn backend to be enabled."
-    opt_level = "01"
+    opt_level = "O1"
 
 except ImportError:
     APEX_IS_AVAILABLE = False

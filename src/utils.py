@@ -52,7 +52,7 @@ def set_config(seed: int, device: torch.device,
             torch.backends.cudnn.benchmark = False
 
         if not enforce_reproducibility:
-            # torch.backends.cudnn.deterministic = False
+            torch.backends.cudnn.deterministic = False
             torch.backends.cudnn.benchmark = True
 
     # I may be confused, but I think PyTorch by default uses half of the available threads,
@@ -81,7 +81,7 @@ def set_config(seed: int, device: torch.device,
 
 
 def get_train_dev_sets(dataset: Dataset,
-                       dev_split: float = 0.1) -> Tuple[Dataset, ...]:
+                       dev_split: float = 0.1) -> Tuple[Dataset, Dataset]:
 
     # Random Split
     train_split = 1.0 - dev_split
@@ -132,7 +132,7 @@ def save_checkpoint(model: torch.nn.Module,
     # TODO : Add a flag to optionally save the optimizer if needed
     # TODO : Extend this method to multiple models and optimizers.
     # TODO : Decide where to create checkpoint folder if it doesn't exist.
-    # TODO : Support save checkpoints when using APEX : https://github.com/NVIDIA/apex
+    # TODO : Support save checkpoints when using APEX : https://github.com/NVIDIA/apex#checkpointing
     # Models paths
     path_to_models = Path(path_to_checkpoints) / "{}".format(prefix + "model" +
                                                              suffix +
@@ -182,7 +182,7 @@ def load_from_checkpoint(model: torch.nn.Module,
             and a torch optimizer.
 
     """
-    # TODO : Support load checkpoints when using APEX : https://github.com/NVIDIA/apex
+    # TODO : Support load checkpoints when using APEX : https://github.com/NVIDIA/apex#checkpointing
     # TODO : Add a flag to optionally load the optimizer if needed
     model.load_state_dict(torch.load(paths["model"], map_location=device))
 
