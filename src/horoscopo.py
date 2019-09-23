@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List, Tuple, Union
 
-from src.AutoEncoder import autoencoder, training_step
+from src.AutoEncoder import autoencoder, simple_autoencoder, training_step
 from src.dataloaders.dataloaders import build_dataloader_from_disk
 from src.utils import process_batch, set_config
 
@@ -26,7 +26,8 @@ train_loader, dev_loader = build_dataloader_from_disk(
     **kwargs["build_dataloader_from_disk"])
 
 # We initialize the model
-model = autoencoder(**kwargs["autoencoder"]).to(device)
+# model = autoencoder(**kwargs["autoencoder"]).to(device)
+model = simple_autoencoder(**kwargs["simple_autoencoder"]).to(device)
 
 for index, batch in enumerate(train_loader):
 
