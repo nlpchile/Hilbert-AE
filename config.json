@@ -28,6 +28,9 @@
         "nc": 13964,
         "ndf": 16
     },
+    "simple_autoencoder": {
+        "num_channels": 13964
+    },
     "optimizer": {
         "lr": 1e-4,
         "betas": [
