@@ -70,8 +70,8 @@ def train(kwargs: Dict) -> None:
     # Initialize Model
     # TODO : Define a get_models() method that outputs a dictionary
 
-    # model = autoencoder(**kwargs["autoencoder"]).to(device)
-    model = simple_autoencoder(**kwargs["simple_autoencoder"]).to(device)
+    model = autoencoder(**kwargs["autoencoder"]).to(device)
+    #model = simple_autoencoder(**kwargs["simple_autoencoder"]).to(device)
 
     # TODO : Define a get_criterions() method that outputs a dictionary
     criterion = torch.nn.MSELoss(**kwargs["loss"])
@@ -101,7 +101,7 @@ def train(kwargs: Dict) -> None:
     training_loss_accumulator = Accumulator()
     validation_loss_accumulator = Accumulator()
 
-    for epoch in tqdm(range(epochs), position=0, desc="epoch"):
+    for epoch in tqdm(range(epochs), position=0, desc="epoch", unit="epochs"):
 
         # Logging Model Weights
         # TODO : Add a "log_every" configurable parameter,
@@ -125,7 +125,10 @@ def train(kwargs: Dict) -> None:
         training_loss_accumulator.reset()
 
         for idx, batch in enumerate(
-                tqdm(train_loader, position=1, desc="train batch")):
+                tqdm(train_loader,
+                     position=0,
+                     desc="train batch",
+                     unit="batches")):
 
             batch = batch.to(device)
             batch = process_batch(batch=batch)
@@ -150,7 +153,7 @@ def train(kwargs: Dict) -> None:
         validation_loss_accumulator.reset()
 
         for jdx, batch in enumerate(
-                tqdm(dev_loader, position=2, desc="dev batch")):
+                tqdm(dev_loader, position=0, desc="dev batch")):
 
             batch = batch.to(device)
             batch = process_batch(batch=batch)
