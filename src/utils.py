@@ -132,7 +132,7 @@ def save_checkpoint(model: torch.nn.Module,
     # TODO : Add a flag to optionally save the optimizer if needed
     # TODO : Extend this method to multiple models and optimizers.
     # TODO : Decide where to create checkpoint folder if it doesn't exist.
-
+    # TODO : Support save checkpoints when using APEX : https://github.com/NVIDIA/apex
     # Models paths
     path_to_models = Path(path_to_checkpoints) / "{}".format(prefix + "model" +
                                                              suffix +
@@ -182,6 +182,7 @@ def load_from_checkpoint(model: torch.nn.Module,
             and a torch optimizer.
 
     """
+    # TODO : Support load checkpoints when using APEX : https://github.com/NVIDIA/apex
     # TODO : Add a flag to optionally load the optimizer if needed
     model.load_state_dict(torch.load(paths["model"], map_location=device))
 
