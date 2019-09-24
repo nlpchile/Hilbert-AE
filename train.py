@@ -74,7 +74,8 @@ def train(kwargs: Dict) -> None:
     #model = simple_autoencoder(**kwargs["simple_autoencoder"]).to(device)
 
     # TODO : Define a get_criterions() method that outputs a dictionary
-    criterion = torch.nn.MSELoss(**kwargs["loss"])
+    # criterion = torch.nn.MSELoss(**kwargs["loss"])
+    criterion = torch.nn.BCEWithLogitsLoss(**kwargs["loss"])
 
     # TODO : Define a get_optimizers() method that outputs a dictionary
     optimizer = torch.optim.Adam(params=model.parameters(),
