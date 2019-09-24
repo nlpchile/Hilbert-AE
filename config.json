@@ -42,8 +42,6 @@
         "amsgrad": false
     },
     "loss": {
-        "size_average": null,
-        "reduce": null,
         "reduction": "mean"
     },
     "seed": 42,
