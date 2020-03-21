@@ -1,7 +1,10 @@
+from pathlib import Path
+
 import numpy as np
 import pytest
 
 from src.HilbertMapper import HilbertMapper
+from src.utils import create_folders
 
 
 def test_01_hilbert_curve():
@@ -27,6 +30,8 @@ def test_02_sequence2hilbert():
     hilbert_map = np.array([[0, 1], [3, 2]], dtype=np.int)
 
     expected_shape = (*hilbert_map.shape, number_of_channels)
+
+    assert hasattr(HilbertMapper, "sequence2hilbert")
 
     mapped_sequence = HilbertMapper.sequence2hilbert(
         sequence=sequence,
@@ -57,7 +62,11 @@ def test_03_hilbert_curve_and_sequence_2_hilbert():
          [[0, 0], [0, 0], [1, 0], [1, 0]], [[0, 0], [0, 0], [1, 0], [1, 0]]],
         dtype=np.int)
 
+    assert hasattr(HilbertMapper, "hilbert_curve")
+
     hilbert_map = HilbertMapper.hilbert_curve(order=order)
+
+    assert hasattr(HilbertMapper, "sequence2hilbert")
 
     mapped_sequence = HilbertMapper.sequence2hilbert(
         sequence=sequence,
@@ -77,6 +86,8 @@ def test_04_hilbert_mapper():
     # We initialize our mapper object
     mapper = HilbertMapper(order=order, number_of_channels=number_of_channels)
 
+    assert callable(mapper)
+
     # We invoke its "__call__" method
     mapped_sequence = mapper(sequence=sequence)
 
@@ -86,3 +97,20 @@ def test_04_hilbert_mapper():
         dtype=np.int)
 
     assert (mapped_sequence == expected_mapped_sequence).all()
+
+    @pytest.skip(msg="WIP")
+    def test_05_create_folders():
+
+        path_to_folder = "./test_05/foo/boo/"
+        parents = True
+        exist_ok = True
+
+        absolute_path_to_folder = create_folders(path=path_to_folder,
+                                                 parents=parents,
+                                                 exist_ok=exist_ok)
+
+        assert isinstance(absolute_path_to_folder, str)
+
+        path = Path(absolute_path_to_folder)
+
+        assert path.is_dir()
