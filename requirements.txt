@@ -1,5 +1,15 @@
-torch==1.2.0
-tensorflow==1.14.0
+# Asynchronous Execution of Callables
+futures==3.1.1
+
+# Interface with HDF5 Binary Data Format
 h5py==2.10.0
-future==0.17.1
-tqdm==4.36.1
+
+# Progress Bar
+tqdm==4.42.1
+
+# PyTorch
+torch==1.4.0
+torchvision==0.5.0
+
+# TensorFlow
+tensorflow-gpu==2.1.0
