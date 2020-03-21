@@ -7,6 +7,7 @@ import h5py
 import numpy as np
 import torch
 from torch.utils.data import Dataset
+from tqdm import tqdm
 
 from src.dataloaders.Tokens import Tokens
 from src.utils import create_folders
@@ -228,7 +229,7 @@ def process_file(dataset: Dataset,
         maxshape=(None, *shape),
     )
 
-    for index in range(0, len(dataset)):
+    for index in range(0, len(tqdm(dataset))):
 
         data = dataset[index]
 
